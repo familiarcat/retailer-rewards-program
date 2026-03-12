@@ -118,6 +118,58 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   padding: 1.75rem 1.5rem 3rem;
 }
 
+/* ── Breadcrumb — floats above the header glass panel ───────────────── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  padding: 0 0.2rem;
+}
+
+.breadcrumb__home {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.13s;
+}
+.breadcrumb__home:hover         { color: var(--text-primary); }
+.breadcrumb__home:focus-visible { outline: 2px solid var(--accent-indigo); outline-offset: 3px; border-radius: 3px; }
+
+.breadcrumb__sep {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  user-select: none;
+}
+
+.breadcrumb__current {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ── Sub-view page title — sits below the header on non-home views ──── */
+.page-header {
+  margin: 1.35rem 0 1.1rem;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0;
+  color: var(--text-primary);
+  background: linear-gradient(120deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    APP HEADER
    ══════════════════════════════════════════════════════════════════════ */
@@ -197,39 +249,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .app-title--link { cursor: pointer; }
 .app-title--link:hover { opacity: 0.8; }
 
-/* ── Breadcrumb nav ──────────────────────────────────────────────────── */
-.app-nav { display: flex; align-items: center; gap: 0.35rem; }
-
-.nav-tab {
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  background: var(--glass-bg-deep);
-  backdrop-filter: blur(var(--glass-blur-sm));
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-  color: var(--text-primary); /* high contrast for nav items */
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-.nav-tab:hover {
-  background: rgba(255, 255, 255, 0.18);
-  color: var(--text-primary);
-}
-.nav-tab.nav-tab--active {
-  background: rgba(165, 180, 252, 0.18);
-  border-color: rgba(165, 180, 252, 0.45);
-  color: var(--accent-indigo);
-  cursor: default;
-}
-
-/* nav separator */
-.nav-sep {
-  color: var(--text-dim);
-  font-size: 0.75rem;
-}
+/* (breadcrumb navigation is now above the header — see .breadcrumb above) */
 
 /* ── State indicators ────────────────────────────────────────────────── */
 .loading { color: var(--text-muted); font-style: italic; padding: 1.5rem 0; text-align: center; }
@@ -944,13 +964,12 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 @media (max-width: 640px) {
-  .app-container    { padding: 1rem 0.9rem 2rem; }
-  .app-header       { flex-direction: column; align-items: flex-start; }
-  .kpi-row          { grid-template-columns: repeat(2, 1fr); }
-  .mod-grid         { grid-template-columns: 1fr; }
-  .recent-row       { grid-template-columns: 1fr auto; }
-  .recent-row__id,
+  .app-container  { padding: 1rem 0.9rem 2rem; }
+  .page-title     { font-size: 1.25rem; }
+  .kpi-row        { grid-template-columns: repeat(2, 1fr); }
+  .mod-grid       { grid-template-columns: 1fr; }
+  .recent-row     { grid-template-columns: 1fr auto; }
   .recent-row__date { display: none; }
-  .tx-toolbar       { flex-direction: column; align-items: stretch; }
-  .pchart-row       { grid-template-columns: 6rem 1fr 3rem; }
+  .tx-toolbar     { flex-direction: column; align-items: stretch; }
+  .pchart-row     { grid-template-columns: 6rem 1fr 3rem; }
 }
