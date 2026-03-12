@@ -1,0 +1,50 @@
+:root {
+  --bg-color: #000000;
+  --text-color: #ffffff;
+  --accent-color: #FFFF00; /* Bright Yellow */
+  --border-color: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Verdana', sans-serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--accent-color);
+  padding-bottom: 10px;
+}
+
+/* High Contrast Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid var(--border-color);
+  margin: 20px 0;
+}
+
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: var(--text-color);
+  color: var(--bg-color);
+  font-weight: bold;
+}
+
+/* Loading State */
+.loading {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  text-align: center;
+  padding: 2rem;
+}
