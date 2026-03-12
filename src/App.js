@@ -99,9 +99,10 @@ function App() {
               onKeyDown={view !== 'home' ? (e) => e.key === 'Enter' && navigate('home') : undefined}
               title={view !== 'home' ? 'Back to dashboard' : undefined}
             >
-              Rewards
+              {/* Two-level typographic contrast: micro eyebrow + oversized wordmark */}
+              <span className="app-brand__eyebrow">Retailer</span>
+              <span className="app-brand__wordmark">Rewards</span>
             </h1>
-            <p className="app-subtitle">Retailer Rewards Portal</p>
           </div>
         </div>
       </header>

@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    DESIGN TOKENS
    ══════════════════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
 
 :root {
   /* Glass surfaces — 30% white per spec */
@@ -18,8 +18,12 @@
   --accent-teal:    #5eead4;
   --accent-pink:    #f9a8d4;
   --accent-amber:   #fcd34d;
-  --accent-green:   #6ee7b7;
-  --accent-violet:  #c4b5fd;
+  --accent-green:    #6ee7b7;
+  --accent-emerald:  #34d399;   /* money-green terminus of pts earned gradient */
+  --accent-violet:   #c4b5fd;
+
+  /* Points earned gradient — amber (gold) → emerald (money) */
+  --gradient-pts: linear-gradient(90deg, #fbbf24 0%, #34d399 100%);
 
   /* Semantic accent aliases */
   --accent-rewards:      var(--accent-indigo);
@@ -154,17 +158,31 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 /* ── Sub-view page title — sits below the header on non-home views ──── */
+/*
+ * Typographic hierarchy: Playfair Display serif mirrors the logo wordmark at a
+ * subordinate scale. Weight 700 (vs logo's 900), size 1.35rem (vs logo's 2.2rem).
+ * Gradient starts at amber and deepens — same warm family as the wordmark but
+ * without the cream-white lead-in, signalling a tier-two heading clearly.
+ */
 .page-header {
   margin: 1.35rem 0 1.1rem;
 }
 
 .page-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  /* 1.3 line-height + padding-bottom gives Playfair's descenders (g, y, p)
+     room to render fully — clip is caused by -webkit-background-clip: text
+     combined with a tight line-height that cuts the paint rect short. */
+  line-height: 1.3;
+  padding-bottom: 0.12em;
   margin: 0;
-  color: var(--text-primary);
-  background: linear-gradient(120deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+  /* Middle band of the logo gradient: cream-start is omitted, deep-amber end
+     is omitted — only the #fcd34d → #f59e0b amber core is used.
+     This places page titles visually "inside" the logo's colour arc. */
+  background: linear-gradient(125deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -225,25 +243,60 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   align-items: center;
 }
 
-/* Gradient title */
+/* Two-level brand mark: micro eyebrow + oversized wordmark */
 .app-header-text h1 {
-  margin: 0 0 0.1rem;
-  font-size: 1.3rem;
-  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05em;
+  /* Reset any inherited gradient — children set their own */
+  background: none;
+  -webkit-text-fill-color: inherit;
+}
+
+/*
+ * Eyebrow — Inter sans-serif, spaced capitals, indented to nest under the "R" of
+ * the wordmark. The 1.45rem left indent aligns the "E" of "RETAILER" roughly with
+ * the second character of "Rewards", creating a staggered logo lockup where the
+ * Playfair "R" visually anchors both lines.
+ */
+.app-brand__eyebrow {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+  line-height: 1;
+  padding-left: 1.45rem;
+}
+
+/*
+ * Wordmark — Playfair Display serif, dominant, warm amber/gold gradient.
+ * Contrast layer #2: typeface (editorial serif vs geometric sans), size 2.2rem,
+ * tight tracking, bracketed serifs vs clean sans above.
+ * Warm gradient: cream-white → amber → deep gold — ties into "points = gold" language.
+ */
+.app-brand__wordmark {
+  display: block;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 2.2rem;
+  font-weight: 900;
   letter-spacing: -0.02em;
-  background: linear-gradient(120deg, var(--accent-indigo) 0%, var(--accent-pink) 60%, var(--accent-teal) 100%);
+  line-height: 0.92;
+  background: linear-gradient(
+    130deg,
+    #fff8e8        0%,
+    #fcd34d       40%,
+    #f59e0b       75%,
+    #d97706      100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-.app-subtitle {
-  color: var(--text-muted); /* bumped from --text-dim */
-  margin: 0;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .app-title--link { cursor: pointer; }
@@ -292,7 +345,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   width: 12px;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent-indigo), var(--accent-teal));
+  background: var(--gradient-pts);
 }
 
 /* ── KPI strip ───────────────────────────────────────────────────────── */
@@ -687,7 +740,14 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
    REWARDS VIEW
    ══════════════════════════════════════════════════════════════════════ */
 
-.customer-rewards { display: flex; flex-direction: column; gap: 1.35rem; }
+/* Slight left indent of customer cards below the "Rewards Catalog" page title,
+   creating a subtle visual relationship between title and content. */
+.customer-rewards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  padding-left: 1.25rem;
+}
 
 .customer-section {
   background: var(--glass-bg);
@@ -700,21 +760,30 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   overflow: hidden;
 }
 
-/* Per-customer accent bar */
+/* Per-customer accent bar — amber→green = points earned visual language */
 .customer-section::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent-indigo), var(--accent-violet));
+  background: var(--gradient-pts);
 }
 
+/*
+ * Customer name — Inter sans-serif, semi-bold 600, 1.25rem.
+ * Returns to the geometric sans-serif of the UI body; the size and weight
+ * give it authority within the card without competing with the serif page title.
+ * Pure white (--text-primary) for maximum legibility on the glass panel.
+ */
 .customer-id {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--accent-indigo);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  -webkit-text-fill-color: var(--text-primary);
   margin-bottom: 1rem;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  background: none;
 }
 
 .filter-notice {
@@ -749,7 +818,33 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted); /* bumped from --text-dim */
+  color: var(--accent-rewards);
+}
+
+/*
+ * Column differentiation — Month column gets a cool indigo tint,
+ * Points Earned column gets a warm amber tint. The contrast between
+ * cool-left / warm-right gives each column a distinct visual lane,
+ * making it easy to scan horizontally without heavy dividers.
+ * Tints are intentionally light so they layer cleanly over the row stripes.
+ */
+.rewards-table th:first-child,
+.rewards-table td:first-child {
+  background-color: rgba(165, 180, 252, 0.07);
+  border-right: 1px solid rgba(165, 180, 252, 0.14);
+  /* Month names in full white for maximum legibility against the indigo tint */
+  color: #ffffff;
+}
+.rewards-table th:first-child {
+  color: var(--accent-indigo);
+}
+
+.rewards-table th:last-child,
+.rewards-table td:last-child {
+  background-color: rgba(251, 191, 36, 0.07);
+}
+.rewards-table th:last-child {
+  color: var(--accent-amber);
 }
 
 .rewards-table td {
@@ -757,18 +852,41 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   color: var(--text-secondary);
 }
 
+/*
+ * Alternating row tints — warm amber on odd rows, cool glass on even rows.
+ * The warm/cool alternation gives each row a distinct identity without
+ * high-contrast borders, letting the user track horizontally across columns.
+ */
+.rewards-table tbody tr:nth-child(odd) {
+  background: rgba(251, 191, 36, 0.06);
+}
+.rewards-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+.rewards-table tbody tr:hover {
+  background: rgba(251, 191, 36, 0.12) !important;
+  transition: background 0.12s;
+}
+
 .rewards-table tr:last-child td { border-bottom: none; }
 
-/* Table caption — screen-reader text + subtle visual label */
+/*
+ * Table caption — visually hidden but present for screen readers and tests.
+ * Uses the standard sr-only pattern: element is in the DOM and accessible
+ * but occupies no visual space. The heading "Rewards Table" is redundant
+ * given the page title and customer name already provide the context.
+ */
 .rw-caption {
-  text-align: left;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted); /* bumped from --text-dim */
-  padding: 0 0.75rem 0.5rem;
   caption-side: top;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Month points visual cell */
@@ -780,47 +898,73 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   gap: 0.25rem;
 }
 
+/*
+ * Points bar — amber → emerald gradient.
+ * Left (origin) = gold/amber: the "currency" start.
+ * Right (terminus) = emerald/green: universal money/growth signal.
+ * The bar length maps earned points visually; more points = more green reached.
+ */
+/*
+ * pts-bar gradient is always drawn at full-track width (set via inline backgroundSize).
+ * background-repeat: no-repeat prevents the gradient from tiling if backgroundSize > 100%.
+ * background-position: left ensures the amber origin is always at the bar's left edge.
+ */
 .pts-bar {
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent-violet), var(--accent-pink));
+  height: 4px;
+  background: var(--gradient-pts);
+  background-repeat: no-repeat;
+  background-position: left center;
   border-radius: 2px;
-  min-width: 3px;
-  opacity: 0.75;
+  min-width: 4px;
+  opacity: 0.92;
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.25);
   transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Points number — emerald green: all numerical points values use the money-green language */
 .pts-num {
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--text-primary);
+  color: var(--accent-emerald);
 }
 
+/*
+ * Total points summary pill — fully green to signal "money earned / growth".
+ * Green is the terminus of the pts-bar gradient; the pill anchors that language
+ * by being the final resolved state of all that accumulated amber→green activity.
+ */
 .total-points {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 700;
-  color: var(--accent-teal);
-  font-size: 0.875rem;
+  color: var(--accent-emerald);
+  font-size: 0.9rem;
   padding: 0.45rem 0.85rem;
-  background: rgba(94, 234, 212, 0.10);
+  background: rgba(52, 211, 153, 0.10);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(94, 234, 212, 0.22);
+  border: 1px solid rgba(52, 211, 153, 0.32);
   font-variant-numeric: tabular-nums;
 }
 .total-points::before {
   content: '◆';
   font-size: 0.55rem;
-  color: var(--accent-teal);
-  opacity: 0.7;
+  color: var(--accent-emerald);
+  opacity: 0.8;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
    TRANSACTION VIEW
    ══════════════════════════════════════════════════════════════════════ */
 
-.tx-view { display: flex; flex-direction: column; gap: 1.1rem; }
+/* Matches the 1.25rem left indent applied to .customer-rewards */
+.tx-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding-left: 1.25rem;
+}
 
 .tx-toolbar {
   display: flex;
@@ -900,9 +1044,15 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   opacity: 0.6;
 }
 
+/*
+ * Row striping — matches rewards table: odd rows warm amber, even rows cool glass.
+ * Middle columns (Customer, Amount, Date) reveal the stripe; the anchored
+ * Product and Points columns stay on their own constant column tints.
+ */
 .tx-row { transition: background 0.1s; }
-.tx-row:nth-child(even) { background: var(--glass-bg-subtle); }
-.tx-row:hover           { background: rgba(255,255,255,0.13); }
+.tx-row:nth-child(odd)  { background: rgba(251, 191, 36, 0.06); }
+.tx-row:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+.tx-row:hover           { background: rgba(251, 191, 36, 0.12) !important; }
 
 .tx-cell {
   padding: 0.6rem 0.9rem;
@@ -910,9 +1060,48 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   color: var(--text-secondary);
   vertical-align: middle;
 }
-.tx-cell--product { font-weight: 600; color: var(--text-primary); }
-.tx-cell--date { color: var(--text-secondary); } /* bumped from --text-muted */
-.tx-cell--pts  { white-space: nowrap; }
+.tx-cell--product { font-weight: 600; }
+.tx-cell--date    { color: var(--text-secondary); }
+.tx-cell--pts     { white-space: nowrap; }
+
+/*
+ * Column differentiation — each of the 5 columns has its own identity tint.
+ * Tints are layered on top of the tr row-stripe background:
+ *   Col 1  Product  — indigo   (navigation/identifier lane)
+ *   Col 2  Customer — violet   (person/identity)
+ *   Col 3  Amount   — teal     (transactional data)
+ *   Col 4  Date     — slate    (temporal, neutral)
+ *   Col 5  Points   — amber    (value/currency — leads to green bar terminus)
+ * Opacity is kept very low so tints provide lane cues without drowning the stripes.
+ */
+.tx-table th:nth-child(1),
+.tx-table td:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.07);
+  border-right: 1px solid rgba(165, 180, 252, 0.12);
+  color: #ffffff;
+}
+.tx-table th:nth-child(1) { color: var(--accent-indigo); }
+
+.tx-table th:nth-child(2),
+.tx-table td:nth-child(2) {
+  background-color: rgba(196, 181, 253, 0.05);
+}
+
+.tx-table th:nth-child(3),
+.tx-table td:nth-child(3) {
+  background-color: rgba(94, 234, 212, 0.05);
+}
+
+.tx-table th:nth-child(4),
+.tx-table td:nth-child(4) {
+  background-color: rgba(148, 163, 184, 0.04);
+}
+
+.tx-table th:nth-child(5),
+.tx-table td:nth-child(5) {
+  background-color: rgba(251, 191, 36, 0.07);
+}
+.tx-table th:nth-child(5) { color: var(--accent-amber); }
 
 /* Amount cell with micro-bar */
 .amt-cell {
@@ -920,11 +1109,18 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   flex-direction: column;
   gap: 0.22rem;
 }
+/*
+ * Amount micro-bar — amber→green, same gradient family as the pts-bar.
+ * Visually connects "spend amount" to "points earned" using the same
+ * directional colour language (gold at origin, money-green at terminus).
+ */
 .amt-bar {
   height: 2px;
-  background: linear-gradient(90deg, var(--accent-teal), var(--accent-indigo));
+  background: var(--gradient-pts);
+  background-repeat: no-repeat;
+  background-position: left center;
   border-radius: 2px;
-  opacity: 0.55;
+  opacity: 0.6;
   transition: width 0.5s ease;
   min-width: 2px;
 }
@@ -935,15 +1131,21 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-size: 0.875rem;
 }
 
-/* Points badge */
+/*
+ * Points badge (transaction table).
+ * Earned-points badges use a left amber / right green border gradient to echo
+ * the pts-bar gradient — the pill itself "earns" green as it fills rightward.
+ * Zero-point badges stay muted: they haven't crossed the earning threshold.
+ */
+/* Earned-points badge — fully emerald: consistent with all other points references */
 .pts-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.22rem 0.65rem;
-  background: rgba(196, 181, 253, 0.14);
-  border: 1px solid rgba(196, 181, 253, 0.28);
-  color: var(--accent-violet);
+  background: rgba(52, 211, 153, 0.10);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  color: var(--accent-emerald);
   border-radius: 10px;
   font-size: 0.73rem;
   font-weight: 700;
@@ -951,7 +1153,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 .pts-badge--zero {
   background: rgba(100,116,139,0.10);
-  border-color: rgba(100,116,139,0.15);
+  border: 1px solid rgba(100,116,139,0.15);
   color: var(--text-dim);
 }
 
@@ -965,7 +1167,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 @media (max-width: 640px) {
   .app-container  { padding: 1rem 0.9rem 2rem; }
-  .page-title     { font-size: 1.25rem; }
+  .page-title     { font-size: 1.4rem; }
   .kpi-row        { grid-template-columns: repeat(2, 1fr); }
   .mod-grid       { grid-template-columns: 1fr; }
   .recent-row     { grid-template-columns: 1fr auto; }

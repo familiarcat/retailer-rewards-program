@@ -94,14 +94,21 @@ const TransactionView = () => {
           </thead>
           <tbody>
             {rows.map((tx) => {
-              const barPct = Math.max(Math.round((tx.amount / maxAmount) * 100), 3);
+              // Mirror the pts-bar backgroundSize trick: the gradient spans the
+              // full column width so a $55 bar shows amber-to-slight-yellow while
+              // a $200 bar (the max) shows the full amber→green arc.
+              const rawAmtPct = Math.round((tx.amount / maxAmount) * 100);
+              const barPct    = Math.max(rawAmtPct, 3);
+              const amtBgSize = rawAmtPct > 0
+                ? `${Math.round(10000 / rawAmtPct)}% 100%`
+                : '10000% 100%';
               return (
                 <tr key={tx.transactionId} className="tx-row">
                   <td className="tx-cell tx-cell--product">{tx.product}</td>
                   <td className="tx-cell">{tx.customerId}</td>
                   <td className="tx-cell">
                     <div className="amt-cell">
-                      <div className="amt-bar" style={{ width: `${barPct}%` }} aria-hidden="true" />
+                      <div className="amt-bar" style={{ width: `${barPct}%`, backgroundSize: amtBgSize }} aria-hidden="true" />
                       <span className="amt-num">${tx.amount.toFixed(2)}</span>
                     </div>
                   </td>
