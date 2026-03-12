@@ -4,12 +4,21 @@
 
 The **Retailer Rewards Program** is a software solution designed to calculate and manage reward points for customers based on their transaction history. This codebase provides the logic for tracking purchases and assigning points according to specific business rules.
 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). It demonstrates a clean, test-driven implementation of a frontend application that fetches and processes data according to the following business logic.
+
+### Rewards Calculation Rules
+- **2 points** for every dollar spent over $100 in a single transaction.
+- **1 point** for every dollar spent between $50 and $100.
+
+For example, a **$120** purchase earns **90 points**: `(120 - 100) * 2 + (100 - 50) * 1 = 40 + 50 = 90`.
+
 ## Technology Stack
 
-*   **Runtime Environment**: Node.js
+*   **Framework**: React.js
+*   **UI Library**: None (plain CSS)
 *   **Package Manager**: npm / yarn
-*   **Build Tools**: Standard build scripts outputting to `build/` or `dist/`
-*   **Testing**: Configured with code coverage reports
+*   **Build Tools**: React Scripts (`create-react-app`)
+*   **Testing**: Jest & React Testing Library
 
 ## Getting Started
 
