@@ -69,11 +69,18 @@
   /* Points earned gradient — amber (gold) → emerald (money) */
   --gradient-pts: linear-gradient(90deg, #fbbf24 0%, #34d399 100%);
 
+  /* Brand/Heading gradient — cream → amber → deep orange */
+  --gradient-brand: linear-gradient(130deg, #fff8e8 0%, #fcd34d 40%, #f59e0b 75%, #d97706 100%);
+
   /* Semantic accent aliases */
   --accent-rewards:      var(--accent-indigo);
   --accent-transactions: var(--accent-teal);
   --accent-points:       var(--accent-pink);
   --accent-months:       var(--accent-amber);
+  /* Customer identity colour — single source of truth used by every
+     component that renders a customer name (chart labels, table cells,
+     card headings, filter bar). Changing this one token updates all of them. */
+  --accent-customer:     var(--accent-indigo);
 
   /*
    * Typography — contrast verified against glass panel effective background
@@ -435,10 +442,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   line-height: 1.3;
   padding-bottom: 0.12em;
   margin: 0;
-  /* Middle band of the logo gradient: cream-start is omitted, deep-amber end
-     is omitted — only the #fcd34d → #f59e0b amber core is used.
-     This places page titles visually "inside" the logo's colour arc. */
-  background: linear-gradient(125deg, #fcd34d 0%, #f59e0b 50%, #d97706 100%);
+  /* Matches the main header gradient */
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -479,19 +484,31 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 /* Logo mark */
+/* AppLogo SVG — transparent background; margin-right separates it from the
+   brand wordmark. No background/border needed — the SVG draws its own ring. */
 .app-logo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 10px;
-  background: linear-gradient(135deg, rgba(165,180,252,0.25), rgba(196,181,253,0.20));
-  border: 1px solid rgba(165,180,252,0.3);
-  font-size: 1rem;
-  margin-right: 0.75rem;
+  margin-right: 0.85rem;
   flex-shrink: 0;
-  vertical-align: middle;
+  transition: opacity 0.18s ease, transform 0.18s ease, filter 0.18s ease;
+  /* Subtle drop-shadow picks up the page background color so the ring appears
+     to float slightly. filter() is GPU-composited and costs nothing at runtime. */
+  filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.30))
+          drop-shadow(0 0px 2px rgba(245, 158, 11, 0.20));
+}
+
+/* Interactive state — only applied when on a sub-view (logo acts as home link) */
+.app-logo--link {
+  cursor: pointer;
+}
+.app-logo--link:hover {
+  opacity: 0.82;
+  transform: scale(1.07);
+  filter: drop-shadow(0 3px 12px rgba(251, 191, 36, 0.50))
+          drop-shadow(0 0px 4px rgba(245, 158, 11, 0.35));
+}
+.app-logo--link:active {
+  transform: scale(0.97);
+  opacity: 0.70;
 }
 
 .app-header-left {
@@ -543,13 +560,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 0.92;
-  background: linear-gradient(
-    130deg,
-    #fff8e8        0%,
-    #fcd34d       40%,
-    #f59e0b       75%,
-    #d97706      100%
-  );
+  background: var(--gradient-brand);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -841,8 +852,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 .pchart-label {
   font-size: 0.78rem;
-  font-weight: 600; /* bumped weight for legibility */
-  color: var(--text-primary); /* max contrast: these are the data labels */
+  font-weight: 600;
+  color: var(--accent-customer);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -998,7 +1009,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /* ── Cell-level type treatment ───────────────────────────────────────── */
 .recent-cell--product  { font-weight: 600; color: var(--text-primary) !important; }
-.recent-cell--customer { color: var(--accent-indigo) !important; font-weight: 500; }
+.recent-cell--customer { color: var(--accent-customer) !important; font-weight: 500; }
 .recent-cell--amount   { font-weight: 700; color: var(--text-primary) !important; font-variant-numeric: tabular-nums; }
 .recent-cell--date     { color: var(--text-dim) !important; font-size: 0.78rem; }
 
@@ -1125,13 +1136,14 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
  */
 .customer-id {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  -webkit-text-fill-color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 800;
   margin-bottom: 1rem;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
+  color: var(--accent-customer);
+  /* Clear any inherited gradient-clip rules */
   background: none;
+  -webkit-text-fill-color: var(--accent-customer);
 }
 
 .filter-notice {
@@ -1162,10 +1174,10 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 .rewards-table th {
   background: var(--glass-bg-deep);
-  font-weight: 700;
-  font-size: 0.7rem;
+  font-weight: 800;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   color: #c8b8a2;
 }
 
@@ -1179,12 +1191,16 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .rewards-table th:first-child,
 .rewards-table td:first-child {
   background-color: rgba(165, 180, 252, 0.07);
+  padding-left: var(--view-indent);
   border-right: 1px solid rgba(165, 180, 252, 0.14);
   /* Month names in full white for maximum legibility against the indigo tint */
   color: #ffffff;
 }
 .rewards-table th:first-child {
   color: #c8b8a2;
+}
+.rewards-table td:first-child {
+  padding-left: calc(var(--view-indent) + 1rem);
 }
 
 .rewards-table th:last-child,
@@ -1210,10 +1226,6 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 .rewards-table tbody tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.025);
-}
-.rewards-table tbody tr:hover {
-  background: rgba(251, 191, 36, 0.12) !important;
-  transition: background 0.12s;
 }
 
 .rewards-table tr:last-child td { border-bottom: none; }
@@ -1259,23 +1271,25 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .rw-month-label {
   display: inline;
 }
-/* Chevron hidden by default — slides into view on row focus/hover */
+/* Chevron is always visible, rotates on expand */
 .rw-month-chevron {
   display: inline-block;
   margin-left: 0.45rem;
   color: var(--accent-amber);
   font-size: 1.05rem;
   line-height: 1;
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  opacity: 0.7;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 .rw-row--clickable:hover .rw-month-chevron,
 .rw-row--clickable:focus-visible .rw-month-chevron {
   opacity: 1;
-  transform: translateX(0);
 }
-
+.rw-row--expanded .rw-month-chevron {
+  transform: rotate(90deg);
+  opacity: 1;
+}
 /* Month points visual cell */
 .rw-td-pts { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
 
@@ -1397,7 +1411,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   opacity: 0.8;
 }
 .tx-filter-bar__customer {
-  color: var(--text-primary);
+  color: var(--accent-customer);
   font-weight: 700;
 }
 .tx-filter-bar__sep {
@@ -1518,32 +1532,33 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   color: var(--text-secondary);
   vertical-align: middle;
 }
-.tx-cell--product { font-weight: 600; }
-.tx-cell--date    { color: var(--text-secondary); }
-.tx-cell--pts     { white-space: nowrap; }
+.tx-cell--product  { font-weight: 600; }
+.tx-cell--customer { color: var(--accent-customer); font-weight: 500; }
+.tx-cell--date     { color: var(--text-secondary); }
+.tx-cell--pts      { white-space: nowrap; }
 
 /*
  * Column differentiation — each of the 5 columns has its own identity tint.
  * Tints are layered on top of the tr row-stripe background:
- *   Col 1  Product  — indigo   (navigation/identifier lane)
- *   Col 2  Customer — violet   (person/identity)
+ *   Col 1  Customer — violet   (person/identity)
+ *   Col 2  Product  — indigo   (navigation/identifier lane)
  *   Col 3  Amount   — teal     (transactional data)
- *   Col 4  Date     — slate    (temporal, neutral)
- *   Col 5  Points   — amber    (value/currency — leads to green bar terminus)
+ *   Col 4  Points   — amber    (value/currency — leads to green bar terminus)
+ *   Col 5  Date     — slate    (temporal, neutral)
  * Opacity is kept very low so tints provide lane cues without drowning the stripes.
  */
 .tx-table th:nth-child(1),
 .tx-table td:nth-child(1) {
-  background-color: rgba(165, 180, 252, 0.07);
-  border-right: 1px solid rgba(165, 180, 252, 0.12);
-  color: #ffffff;
+  background-color: rgba(196, 181, 253, 0.05);
+  border-right: 1px solid rgba(196, 181, 253, 0.12);
 }
-.tx-table th:nth-child(1) { color: #c8b8a2; }
 
 .tx-table th:nth-child(2),
 .tx-table td:nth-child(2) {
-  background-color: rgba(196, 181, 253, 0.05);
+  background-color: rgba(165, 180, 252, 0.07);
+  color: #ffffff;
 }
+.tx-table th:nth-child(2) { color: #c8b8a2; }
 
 .tx-table th:nth-child(3),
 .tx-table td:nth-child(3) {
@@ -1552,14 +1567,14 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 .tx-table th:nth-child(4),
 .tx-table td:nth-child(4) {
-  background-color: rgba(148, 163, 184, 0.04);
+  background-color: rgba(251, 191, 36, 0.07);
 }
+.tx-table th:nth-child(4) { color: #c8b8a2; }
 
 .tx-table th:nth-child(5),
 .tx-table td:nth-child(5) {
-  background-color: rgba(251, 191, 36, 0.07);
+  background-color: rgba(148, 163, 184, 0.04);
 }
-.tx-table th:nth-child(5) { color: #c8b8a2; }
 
 /* Amount cell with micro-bar */
 .amt-cell {
@@ -1634,3 +1649,158 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   .tx-toolbar     { flex-direction: column; align-items: stretch; }
   .pchart-row     { grid-template-columns: 6rem 1fr 3rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ACCORDION (RewardsTable)
+   ══════════════════════════════════════════════════════════════════════ */
+
+.rw-row--expanded {
+  background-color: rgba(251, 191, 36, 0.12) !important;
+  border-bottom: 1px solid transparent;
+}
+
+/* The Detail Row */
+.rw-details-row { background: rgba(0, 0, 0, 0.2) !important; }
+
+.rw-details-cell {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--glass-border-dim);
+}
+
+.accordion-wrap {
+  padding: 0 0 0.75rem 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, transparent 10px);
+  box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.3);
+}
+
+.accordion-loading,
+.accordion-empty {
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.accordion-list { list-style: none; margin: 0; padding: 0; }
+
+.accordion-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  padding: 0.6rem 1.5rem 0.6rem 2.5rem; /* Increased left padding to nest visually */
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.8rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+.accordion-item:last-child { border-bottom: none; }
+
+.acc-prod { color: var(--text-primary); font-weight: 500; }
+.acc-amt  { color: var(--text-secondary); text-align: right; font-variant-numeric: tabular-nums; }
+.acc-pts  { color: var(--accent-emerald); text-align: right; font-weight: 700; font-size: 0.75rem; }
+.acc-date { color: var(--text-dim); font-size: 0.75rem; text-align: right; }
+
+/* Header for the accordion list */
+.accordion-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.2fr;
+  gap: 0.5rem;
+  padding: 0.4rem 1.5rem 0.4rem 2.5rem;
+  border-bottom: 1px solid var(--glass-border-dim);
+  margin-bottom: 0.25rem;
+}
+
+.acc-header-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.acc-header-label:nth-child(n+2) { text-align: right; }
+.acc-header-label--pts {
+  color: var(--accent-emerald);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════════════════════════════════════ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(7, 11, 22, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 500px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border-dim);
+  background: var(--glass-bg-deep);
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: var(--text-primary); }
+
+.modal-body {
+  padding: 0;
+  overflow-y: auto;
+}
+
+.modal-loading { padding: 2rem; text-align: center; color: var(--text-muted); font-style: italic; }
+
+.modal-list { list-style: none; margin: 0; padding: 0; }
+
+.modal-item {
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-item:last-child { border-bottom: none; }
+
+.modal-item-main { display: flex; flex-direction: column; gap: 0.2rem; }
+.modal-product { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+.modal-date { font-size: 0.78rem; color: var(--text-dim); }
+.modal-amt { font-weight: 700; color: var(--accent-teal); font-variant-numeric: tabular-nums; }

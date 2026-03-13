@@ -60,7 +60,7 @@ describe('CustomerRewards component', () => {
     // Points cell
     expect(screen.getByText('90')).toBeInTheDocument();
     // Total points summary
-    expect(screen.getByText(/Total Points: 90/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total: 90/i)).toBeInTheDocument();
   });
 
   test('shows an empty-state message when rewards list is empty', () => {

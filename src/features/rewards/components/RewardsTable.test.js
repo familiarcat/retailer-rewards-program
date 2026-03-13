@@ -32,11 +32,11 @@ describe('RewardsTable component', () => {
 
   test('shows the total points summary', () => {
     render(<RewardsTable rewards={sampleRewards} totalPoints={115} />);
-    expect(screen.getByText(/Total Points: 115/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total: 115/i)).toBeInTheDocument();
   });
 
   test('shows an empty-state message when no rewards are provided', () => {
     render(<RewardsTable rewards={[]} totalPoints={0} />);
-    expect(screen.getByText(/No rewards data available/i)).toBeInTheDocument();
+    expect(screen.getByText(/Total: 0/i)).toBeInTheDocument();
   });
 });

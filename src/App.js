@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dashboard       from './components/Dashboard';
 import TransactionView from './components/TransactionView';
 import CustomerRewards from './features/rewards/components/CustomerRewards';
+import AppLogo         from './components/AppLogo';
 import useViewTransition from './hooks/useViewTransition';
 import './styles/global.css';
 
@@ -104,7 +105,15 @@ function App() {
       {/* ── App header — anim-header plays once on initial load ── */}
       <header className="app-header anim-header">
         <div className="app-header-left">
-          <span className="app-logo" aria-hidden="true">◈</span>
+          <AppLogo
+            size={44}
+            className={`app-logo${view !== 'home' ? ' app-logo--link' : ''}`}
+            onClick={view !== 'home' ? () => navigate('home') : undefined}
+            role={view !== 'home' ? 'button' : undefined}
+            tabIndex={view !== 'home' ? 0 : undefined}
+            onKeyDown={view !== 'home' ? (e) => e.key === 'Enter' && navigate('home') : undefined}
+            title={view !== 'home' ? 'Back to dashboard' : undefined}
+          />
           <div className="app-header-text">
             <h1
               className={view !== 'home' ? 'app-title--link' : ''}

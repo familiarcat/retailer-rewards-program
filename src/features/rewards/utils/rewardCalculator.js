@@ -1,24 +1,25 @@
 /**
- * Calculates reward points for a given transaction amount.
+ * Calculates reward points based on the transaction amount.
  *
- * Rules:
- *   - $0 – $50:   0 points
- *   - $51 – $100: 1 point per dollar above $50
- *   - $100+:      50 points + 2 points per dollar above $100
+ * Business Rules:
+ * - 2 points for every dollar spent over $100.
+ * - 1 point for every dollar spent between $50 and $100.
  *
- * Fractional dollars are floored before calculation.
- *
- * @param {number} amount - The transaction amount in dollars.
- * @returns {number} The reward points earned.
+ * @param {number} amount - The transaction amount.
+ * @returns {number} The calculated reward points.
  */
-export const calculateRewards = (amount) => {
-  if (amount == null || typeof amount !== 'number' || isNaN(amount) || amount < 0) {
+export const calculateRewardPoints = (amount) => {
+  // Defensive check for invalid inputs
+  if (typeof amount !== 'number' || amount <= 50) {
     return 0;
   }
 
-  const dollars = Math.floor(amount);
+  // Use Math.floor to treat "every dollar spent" as whole integers
+  const totalAmount = Math.floor(amount);
 
-  if (dollars <= 50) return 0;
-  if (dollars <= 100) return dollars - 50;
-  return 50 + (dollars - 100) * 2;
+  if (totalAmount > 100) {
+    return (totalAmount - 100) * 2 + 50;
+  }
+
+  return totalAmount - 50;
 };

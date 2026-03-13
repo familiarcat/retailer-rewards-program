@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactions } from '../features/rewards/services/transactionService';
-import { calculateRewards } from '../features/rewards/utils/rewardCalculator';
-import { getMonthName } from '../features/rewards/utils/dateUtils';
-import useAnimateIn from '../hooks/useAnimateIn';
+import { calculateRewardPoints } from '../features/rewards/utils/rewardCalculator';
 
 const COLUMNS = [
-  { key: 'product',    label: 'Product'   },
   { key: 'customerId', label: 'Customer'  },
+  { key: 'product',    label: 'Product'   },
   { key: 'amount',     label: 'Amount'    },
-  { key: 'date',       label: 'Date'      },
   { key: 'points',     label: 'Points'    },
+  { key: 'date',       label: 'Date'      },
 ];
 
-/**
- * @param {{
- *   txFilter?: { customerId: string, month: string } | null,
- *   onClearFilter?: () => void
- * }} props
- *   txFilter      — when set, pre-filters rows to that customer + month.
- *   onClearFilter — called when the user dismisses the active filter.
- */
-const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
+const TransactionView = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [filter, setFilter]             = useState('');
   const [sortKey, setSortKey]           = useState('date');
   const [sortDir, setSortDir]           = useState('desc');
-
-  // Triggers after the first two animation frames so amt-bar CSS transition
-  // animates from width 0 → target width rather than snapping to final state.
-  const animated = useAnimateIn();
 
   useEffect(() => {
     getTransactions()
@@ -38,28 +24,24 @@ const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
   }, []);
 
   const handleSort = (key) => {
-    if (key === 'points') return; // derived column — skip sorting
     setSortDir((d) => (sortKey === key ? (d === 'asc' ? 'desc' : 'asc') : 'asc'));
     setSortKey(key);
   };
 
   const rows = transactions
-    .map((tx) => ({ ...tx, points: calculateRewards(tx.amount) }))
+    .map((tx) => ({ ...tx, points: calculateRewardPoints(tx.amount) }))
     .filter((tx) => {
-      // Month-scoped drill-through filter (from clicking a RewardsTable row)
-      if (txFilter?.customerId && tx.customerId !== txFilter.customerId) return false;
-      if (txFilter?.month && getMonthName(tx.date) !== txFilter.month) return false;
-      // Free-text search filter (toolbar input)
       if (!filter) return true;
       const q = filter.toLowerCase();
       return (
-        tx.product.toLowerCase().includes(q) ||
+        (tx.product || '').toLowerCase().includes(q) ||
         tx.customerId.toLowerCase().includes(q)
       );
     })
     .sort((a, b) => {
-      const va = a[sortKey];
-      const vb = b[sortKey];
+      // Use empty string as fallback for safe sorting of missing strings
+      const va = a[sortKey] || '';
+      const vb = b[sortKey] || '';
       if (va < vb) return sortDir === 'asc' ? -1 :  1;
       if (va > vb) return sortDir === 'asc' ?  1 : -1;
       return 0;
@@ -72,25 +54,6 @@ const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
 
   return (
     <div className="tx-view">
-
-      {/* ── Month drill-through context bar ──────────────────────────── */}
-      {txFilter && (
-        <div className="tx-filter-bar anim-slide-left">
-          <span className="tx-filter-bar__label">
-            <span className="tx-filter-bar__icon" aria-hidden="true">◈</span>
-            <strong className="tx-filter-bar__customer">{txFilter.customerId}</strong>
-            <span className="tx-filter-bar__sep" aria-hidden="true">·</span>
-            <span className="tx-filter-bar__month">{txFilter.month}</span>
-          </span>
-          <button
-            className="tx-filter-bar__clear"
-            onClick={onClearFilter}
-            aria-label="Clear filter and show all transactions"
-          >
-            View all transactions ×
-          </button>
-        </div>
-      )}
 
       <div className="tx-toolbar">
         <input
@@ -117,7 +80,6 @@ const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
                   className={[
                     'tx-th',
                     sortKey === key  ? 'tx-th--sorted'  : '',
-                    key === 'points' ? 'tx-th--nodrop'  : '',
                   ].filter(Boolean).join(' ')}
                   aria-sort={sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : undefined}
                 >
@@ -130,7 +92,7 @@ const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((tx, idx) => {
+            {rows.map((tx) => {
               // Mirror the pts-bar backgroundSize trick: the gradient spans the
               // full column width so a $55 bar shows amber-to-slight-yellow while
               // a $200 bar (the max) shows the full amber→green arc.
@@ -140,29 +102,21 @@ const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
                 ? `${Math.round(10000 / rawAmtPct)}% 100%`
                 : '10000% 100%';
               return (
-                <tr
-                  key={tx.transactionId}
-                  className="tx-row anim-fade-up"
-                  style={{ '--anim-delay': `${idx * 25}ms` }}
-                >
-                  <td className="tx-cell tx-cell--product">{tx.product}</td>
-                  <td className="tx-cell">{tx.customerId}</td>
+                <tr key={tx.transactionId} className="tx-row">
+                  <td className="tx-cell tx-cell--customer">{tx.customerId}</td>
+                  <td className="tx-cell tx-cell--product">{tx.product || '—'}</td>
                   <td className="tx-cell">
                     <div className="amt-cell">
-                      <div
-                        className="amt-bar"
-                        style={{ width: animated ? `${barPct}%` : '0%', backgroundSize: amtBgSize }}
-                        aria-hidden="true"
-                      />
+                      <div className="amt-bar" style={{ width: `${barPct}%`, backgroundSize: amtBgSize }} aria-hidden="true" />
                       <span className="amt-num">${tx.amount.toFixed(2)}</span>
                     </div>
                   </td>
-                  <td className="tx-cell tx-cell--date">{tx.date}</td>
                   <td className="tx-cell tx-cell--pts">
                     <span className={`pts-badge${tx.points === 0 ? ' pts-badge--zero' : ''}`}>
                       {tx.points} pts
                     </span>
                   </td>
+                  <td className="tx-cell tx-cell--date">{tx.date}</td>
                 </tr>
               );
             })}

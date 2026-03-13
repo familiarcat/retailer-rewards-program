@@ -23,8 +23,6 @@ const MODULES = [
   },
 ];
 
-// Per-customer label accent colours — used for the customer name text only.
-const CHART_LABEL_COLORS = ['#a5b4fc', '#5eead4', '#f9a8d4'];
 const PTS_GRADIENT = 'linear-gradient(90deg, #fbbf24 0%, #34d399 100%)';
 
 // ── KPI configuration ─────────────────────────────────────────────────────────
@@ -87,12 +85,10 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
   return (
     <div className="points-chart">
       {rewards.map((r, i) => {
-        const pct        = Math.round((r.totalPoints / max) * 100);
-        const labelColor = CHART_LABEL_COLORS[i % CHART_LABEL_COLORS.length];
+        const pct = Math.round((r.totalPoints / max) * 100);
         return (
           <div
             key={r.customerId}
-            // Stagger each customer row; base delay offset after KPI cards settle.
             className="pchart-row pchart-row--clickable anim-fade-up"
             style={{ '--anim-delay': `${i * 70 + 160}ms` }}
             onClick={() => onNavigate('rewards', r.customerId)}
@@ -101,7 +97,7 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onNavigate('rewards', r.customerId)}
             aria-label={`${r.customerId}: ${r.totalPoints} points. Click to view their rewards.`}
           >
-            <span className="pchart-label" style={{ color: labelColor }}>{r.customerId}</span>
+            <span className="pchart-label">{r.customerId}</span>
             <div className="pchart-track" aria-hidden="true">
               <div
                 className="pchart-fill"
