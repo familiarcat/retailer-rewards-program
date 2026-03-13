@@ -363,6 +363,47 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   animation: glassReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--anim-delay, 0ms) both;
 }
 
+/* ── Exit keyframes ───────────────────────────────────────────────────── */
+
+/* Counterpart to fadeSlideUp — used for staggered section exits */
+@keyframes fadeSlideDown {
+  from { opacity: 1; transform: translateY(0);     }
+  to   { opacity: 0; transform: translateY(14px);  }
+}
+
+/* Counterpart to slideInLeft — used for toolbar / heading exits */
+@keyframes slideOutLeft {
+  from { opacity: 1; transform: translateX(0);     }
+  to   { opacity: 0; transform: translateX(-16px); }
+}
+
+/* Simple opacity-only fade-out — glass panels, table wrappers */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/*
+ * Exit utility classes — mirror the entry utilities but play in reverse.
+ * Swap in by replacing the entry class when phase === 'exiting'.
+ * All durations ≤ 180 ms so they finish within the 230 ms outro window.
+ */
+
+/* Sections / cards  (counterpart: anim-fade-up) */
+.anim-exit-down {
+  animation: fadeSlideDown 0.17s ease-in var(--anim-delay, 0ms) both;
+}
+
+/* Toolbars / headings  (counterpart: anim-slide-left) */
+.anim-exit-left {
+  animation: slideOutLeft 0.17s ease-in var(--anim-delay, 0ms) both;
+}
+
+/* Glass panels / table wrappers  (counterpart: anim-glass-reveal / anim-fade-in) */
+.anim-exit-fade {
+  animation: fadeOut 0.17s ease-in var(--anim-delay, 0ms) both;
+}
+
 /* ── Focus ring — high visibility ────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--accent-indigo);

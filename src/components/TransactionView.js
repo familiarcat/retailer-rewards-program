@@ -10,7 +10,7 @@ const COLUMNS = [
   { key: 'date',       label: 'Date'      },
 ];
 
-const TransactionView = () => {
+const TransactionView = ({ phase = 'idle' }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [filter, setFilter]             = useState('');
@@ -52,10 +52,16 @@ const TransactionView = () => {
 
   if (loading) return <div className="loading">Loading transaction data…</div>;
 
+  const isExiting = phase === 'exiting';
+
   return (
     <div className="tx-view">
 
-      <div className="tx-toolbar">
+      {/* Toolbar — slides in from the left; exits left on outro */}
+      <div
+        className={`tx-toolbar ${isExiting ? 'anim-exit-left' : 'anim-slide-left'}`}
+        style={{ '--anim-delay': '0ms' }}
+      >
         <input
           type="search"
           className="tx-toolbar__search"
@@ -69,7 +75,12 @@ const TransactionView = () => {
         </span>
       </div>
 
-      <div className="tx-table-wrap">
+      {/* Table glass panel — glass-reveals in; fades out on outro with a 25 ms
+          offset so it follows just after the toolbar exit starts */}
+      <div
+        className={`tx-table-wrap ${isExiting ? 'anim-exit-fade' : 'anim-glass-reveal'}`}
+        style={{ '--anim-delay': isExiting ? '25ms' : '40ms' }}
+      >
         <table className="tx-table">
           <thead>
             <tr>
@@ -92,7 +103,7 @@ const TransactionView = () => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((tx) => {
+            {rows.map((tx, idx) => {
               // Mirror the pts-bar backgroundSize trick: the gradient spans the
               // full column width so a $55 bar shows amber-to-slight-yellow while
               // a $200 bar (the max) shows the full amber→green arc.
@@ -101,8 +112,15 @@ const TransactionView = () => {
               const amtBgSize = rawAmtPct > 0
                 ? `${Math.round(10000 / rawAmtPct)}% 100%`
                 : '10000% 100%';
+              // Row stagger: base 60 ms (after table panel), 22 ms per row,
+              // capped at 160 ms so long lists don't drag on indefinitely.
+              const rowDelay = `${60 + Math.min(idx * 22, 160)}ms`;
               return (
-                <tr key={tx.transactionId} className="tx-row">
+                <tr
+                  key={tx.transactionId}
+                  className="tx-row anim-fade-up"
+                  style={{ '--anim-delay': rowDelay }}
+                >
                   <td className="tx-cell tx-cell--customer">{tx.customerId}</td>
                   <td className="tx-cell tx-cell--product">{tx.product || '—'}</td>
                   <td className="tx-cell">

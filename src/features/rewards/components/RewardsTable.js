@@ -3,7 +3,7 @@ import { getTransactions } from '../services/transactionService';
 import { getMonthName } from '../utils/dateUtils';
 import { calculateRewardPoints } from '../utils/rewardCalculator';
 
-const RewardsTable = ({ rewards, totalPoints, customerId }) => {
+const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) => {
   const [expandedMonths, setExpandedMonths] = useState(new Set());
   const [details, setDetails] = useState({}); // Cache for fetched transactions
   const [loadingMap, setLoadingMap] = useState({});
@@ -36,7 +36,12 @@ const RewardsTable = ({ rewards, totalPoints, customerId }) => {
   };
 
   return (
-    <div className="rewards-table">
+    // Glass-reveal on the table panel; base delay is offset by the parent
+    // section's own stagger so the panel appears just after its heading.
+    <div
+      className="rewards-table anim-glass-reveal"
+      style={{ '--anim-delay': `${sectionDelay + 30}ms` }}
+    >
       <table>
         <caption className="rw-caption">Rewards Table</caption>
         <thead>
@@ -46,15 +51,20 @@ const RewardsTable = ({ rewards, totalPoints, customerId }) => {
           </tr>
         </thead>
         <tbody>
-          {rewards.map(({ month, points }) => {
+          {rewards.map(({ month, points }, rowIdx) => {
             const isExpanded = expandedMonths.has(month);
             const isLoading = loadingMap[month];
             const monthTx = details[month] || [];
+            // Rows stagger from sectionDelay + 50 ms (after the panel glass-reveal)
+            // at 30 ms per row. The heading and panel reveal happen first,
+            // then rows cascade in beneath them.
+            const rowDelay = `${sectionDelay + 50 + rowIdx * 30}ms`;
 
             return (
               <React.Fragment key={month}>
                 <tr
-                  className={`rw-row--clickable ${isExpanded ? 'rw-row--expanded' : ''}`}
+                  className={`rw-row--clickable anim-fade-up ${isExpanded ? 'rw-row--expanded' : ''}`}
+                  style={{ '--anim-delay': rowDelay }}
                   onClick={() => handleToggle(month)}
                   tabIndex={0}
                   role="button"
@@ -106,7 +116,10 @@ const RewardsTable = ({ rewards, totalPoints, customerId }) => {
               </React.Fragment>
             );
           })}
-          <tr className="rw-total-row">
+          <tr
+            className="rw-total-row anim-fade-up"
+            style={{ '--anim-delay': `${sectionDelay + 50 + rewards.length * 30}ms` }}
+          >
             <td colSpan="2" style={{ textAlign: 'left', paddingTop: '1rem' }}>
               <div className="total-points">Total: {totalPoints}</div>
             </td>

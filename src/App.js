@@ -144,12 +144,14 @@ function App() {
           <CustomerRewards
             filterCustomerId={filter}
             onMonthClick={handleMonthClick}
+            phase={phase}
           />
         )}
         {view === 'transactions' && (
           <TransactionView
             txFilter={filter && typeof filter === 'object' ? filter : null}
             onClearFilter={handleClearTxFilter}
+            phase={phase}
           />
         )}
       </main>
