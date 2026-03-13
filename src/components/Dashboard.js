@@ -31,7 +31,7 @@ const KPI_DEFS = [
   { label: 'Customers',            accent: '#a5b4fc', navigateTo: 'rewards',       hint: 'View rewards catalog' },
   { label: 'Transactions',         accent: '#5eead4', navigateTo: 'transactions',  hint: 'View transaction log' },
   { label: 'Total Points Awarded', accent: '#34d399', navigateTo: 'rewards',       hint: 'View rewards catalog' },
-  { label: 'Months Tracked',       accent: '#fcd34d', navigateTo: 'transactions',  hint: 'View transaction log' },
+  { label: 'Months Tracked',       accent: '#fcd34d', navigateTo: 'monthly',       hint: 'View monthly breakdown' },
 ];
 
 // ── Sub-components ─────────────────────────────────────────────────────────────

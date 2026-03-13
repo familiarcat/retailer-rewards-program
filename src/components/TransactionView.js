@@ -10,7 +10,7 @@ const COLUMNS = [
   { key: 'date',       label: 'Date'      },
 ];
 
-const TransactionView = ({ phase = 'idle' }) => {
+const TransactionView = ({ phase = 'idle', onNavigate }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [filter, setFilter]             = useState('');
@@ -73,6 +73,15 @@ const TransactionView = ({ phase = 'idle' }) => {
         <span className="tx-toolbar__count">
           {rows.length} / {transactions.length} records
         </span>
+        {onNavigate && (
+          <button
+            className="tx-toolbar__monthly-btn"
+            onClick={() => onNavigate('monthly')}
+            title="View transactions grouped by month"
+          >
+            📅 Monthly View
+          </button>
+        )}
       </div>
 
       {/* Table glass panel — glass-reveals in; fades out on outro with a 25 ms

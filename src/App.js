@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import Dashboard       from './components/Dashboard';
-import TransactionView from './components/TransactionView';
-import CustomerRewards from './features/rewards/components/CustomerRewards';
-import AppLogo         from './components/AppLogo';
-import useViewTransition from './hooks/useViewTransition';
+import Dashboard              from './components/Dashboard';
+import TransactionView        from './components/TransactionView';
+import MonthlyTransactionView from './components/MonthlyTransactionView';
+import CustomerRewards        from './features/rewards/components/CustomerRewards';
+import AppLogo                from './components/AppLogo';
+import useViewTransition      from './hooks/useViewTransition';
 import './styles/global.css';
 
 // Human-readable label for every routable sub-view.
 const VIEW_LABELS = {
   rewards:      'Rewards Catalog',
   transactions: 'Transaction Log',
+  monthly:      'Monthly Breakdown',
 };
 
 const VIEW_ICONS = {
   rewards:      '⭐',
   transactions: '🗄️',
+  monthly:      '📅',
 };
 
 function App() {
@@ -152,7 +155,11 @@ function App() {
             txFilter={filter && typeof filter === 'object' ? filter : null}
             onClearFilter={handleClearTxFilter}
             phase={phase}
+            onNavigate={navigate}
           />
+        )}
+        {view === 'monthly' && (
+          <MonthlyTransactionView phase={phase} />
         )}
       </main>
 

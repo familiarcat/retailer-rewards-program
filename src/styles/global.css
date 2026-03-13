@@ -1291,45 +1291,90 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 /*
- * Clickable month row — shown when onMonthClick prop is provided to RewardsTable.
- * The row acts as a drill-through link to the Transaction Log for that month.
- * The chevron (›) slides right on hover to reinforce the interactive affordance
- * without cluttering the default resting state.
+ * Clickable month row — accordion trigger for inline transaction details.
+ *
+ * Hover CTA signals (layered so each adds incremental clarity):
+ *   1. Inset amber left rail  — 3 px selection indicator, animates from none → full
+ *   2. Gradient fill           — amber wells up from left edge, dissolves rightward
+ *   3. Month label brightens   — muted → primary text colour
+ *   4. Chevron spring-scales   — 25 % larger + 4 px rightward nudge, springy easing
+ *   5. Points bar glow         — warm amber halo beckons the hidden data within
+ *   6. Active press compress   — darkens on mousedown for tactile feedback
  */
 .rw-row--clickable {
   cursor: pointer;
-  transition: background-color 0.18s ease;
+  transition: background 0.20s ease, box-shadow 0.20s ease;
 }
+
+/* ── Hover / focus ───────────────────────────────────────────────────── */
 .rw-row--clickable:hover,
 .rw-row--clickable:focus-visible {
-  background-color: rgba(251, 191, 36, 0.10) !important;
+  /* Amber gradient wells up from the left and dissolves rightward */
+  background: linear-gradient(
+    90deg,
+    rgba(251, 191, 36, 0.16) 0%,
+    rgba(251, 191, 36, 0.06) 55%,
+    transparent 100%
+  ) !important;
+  /* 3 px inset bar on the left edge acts as an active-selection rail */
+  box-shadow: inset 3px 0 0 var(--accent-amber);
   outline: none;
 }
 .rw-row--clickable:focus-visible {
-  box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.50);
+  /* Keyboard users also get a full perimeter ring on top of the left rail */
+  box-shadow: inset 3px 0 0 var(--accent-amber),
+              inset 0 0 0 1px rgba(251, 191, 36, 0.30);
+}
+/* Tactile press state */
+.rw-row--clickable:active {
+  background: rgba(251, 191, 36, 0.22) !important;
 }
 
+/* ── Month name ──────────────────────────────────────────────────────── */
+/* Resting: slightly muted so the hover contrast is clearly perceptible */
 .rw-month-label {
   display: inline;
+  color: var(--text-secondary);
+  transition: color 0.18s ease;
 }
-/* Chevron is always visible, rotates on expand */
+.rw-row--clickable:hover .rw-month-label,
+.rw-row--clickable:focus-visible .rw-month-label {
+  color: var(--text-primary);
+}
+
+/* ── Chevron (›) ─────────────────────────────────────────────────────── */
+/* Resting: dimmer so the hover uplift is dramatically perceptible */
 .rw-month-chevron {
   display: inline-block;
   margin-left: 0.45rem;
   color: var(--accent-amber);
   font-size: 1.05rem;
   line-height: 1;
-  opacity: 0.7;
-  transform: rotate(0deg);
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0.40;
+  transform: rotate(0deg) scale(1) translateX(0px);
+  /* Spring easing gives a satisfying "ping" — overshoots slightly then settles */
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity   0.18s ease;
 }
 .rw-row--clickable:hover .rw-month-chevron,
 .rw-row--clickable:focus-visible .rw-month-chevron {
   opacity: 1;
+  /* Scale up 25 % and nudge right to "point" more urgently toward the content */
+  transform: rotate(0deg) scale(1.25) translateX(4px);
 }
+/* Expanded: chevron pivots down to show the accordion is open */
 .rw-row--expanded .rw-month-chevron {
-  transform: rotate(90deg);
   opacity: 1;
+  transform: rotate(90deg) scale(1.1) translateX(0px);
+}
+
+/* ── Points bar: warm glow on hover ─────────────────────────────────── */
+/* The bar "lights up" on hover to suggest data is waiting behind this row */
+.rw-row--clickable:hover .pts-bar,
+.rw-row--clickable:focus-visible .pts-bar {
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.50),
+              0 0 14px rgba(251, 191, 36, 0.20);
+  transition: box-shadow 0.20s ease;
 }
 /* Month points visual cell */
 .rw-td-pts { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
@@ -1516,6 +1561,33 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background: var(--glass-bg-deep);
   border: 1px solid var(--glass-border-dim);
   border-radius: 20px;
+}
+
+/* "Monthly View" shortcut pill — amber accent to match the months theme */
+.tx-toolbar__monthly-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid rgba(252, 211, 77, 0.35);
+  border-radius: 20px;
+  background: rgba(252, 211, 77, 0.08);
+  color: var(--accent-months);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+}
+.tx-toolbar__monthly-btn:hover {
+  background: rgba(252, 211, 77, 0.16);
+  border-color: rgba(252, 211, 77, 0.6);
+  color: #fde68a;
+  transform: translateY(-1px);
+}
+.tx-toolbar__monthly-btn:active {
+  transform: translateY(0);
 }
 
 .tx-table-wrap {
@@ -1845,3 +1917,151 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .modal-product { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
 .modal-date { font-size: 0.78rem; color: var(--text-dim); }
 .modal-amt { font-weight: 700; color: var(--accent-teal); font-variant-numeric: tabular-nums; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Monthly Breakdown View  (.mv-*)
+   Transactions grouped by calendar month, each in a distinct glass card.
+   Accent colour: --accent-months (amber) matches the Months Tracked KPI.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Outer wrapper — mirrors .tx-view / .customer-rewards indent ─────── */
+.mv-view {
+  padding: 0 var(--view-indent);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Month section card ───────────────────────────────────────────────── */
+.mv-month-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  /* Amber left accent line — same border-image technique as .customer-rewards */
+  border-left: 1px solid transparent;
+  border-image: linear-gradient(
+    to bottom,
+    rgba(252, 211, 77, 0.65) 0%,
+    rgba(252, 211, 77, 0.18) 55%,
+    transparent 100%
+  ) 1;
+  padding-left: var(--view-indent);
+}
+
+/* ── Month header — heading + stats strip side-by-side ───────────────── */
+.mv-month-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  margin-bottom: 0.8rem;
+}
+
+.mv-month-title {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+/* Year sub-label — Inter small-caps style, muted */
+.mv-month-year {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── Stat pills ───────────────────────────────────────────────────────── */
+.mv-stats-strip {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mv-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  white-space: nowrap;
+}
+
+.mv-stat__val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.mv-stat__lbl {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* Each stat type gets its own accent colour */
+.mv-stat--count  .mv-stat__val { color: var(--accent-indigo); }
+.mv-stat--amount .mv-stat__val { color: var(--accent-teal);   }
+.mv-stat--points .mv-stat__val { color: var(--accent-months); }
+
+/* ── Table wrapper — glass panel container ───────────────────────────── */
+.mv-table-wrap {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────── */
+.mv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+/* Column widths — reuse the same proportions as .tx-table */
+.mv-th--customer { width: 18%; }
+.mv-th--product  { width: 28%; }
+.mv-th--amount   { width: 22%; }
+.mv-th--points   { width: 14%; }
+.mv-th--date     { width: 18%; }
+
+/* ── Rows ─────────────────────────────────────────────────────────────── */
+.mv-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.14s;
+}
+.mv-row:last-child { border-bottom: none; }
+.mv-row:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+.mv-row:hover { background: rgba(255, 255, 255, 0.055); }
+
+/* ── Cells ────────────────────────────────────────────────────────────── */
+.mv-cell {
+  padding: 0.65rem 0.9rem;
+  vertical-align: middle;
+  color: var(--text-secondary);
+}
+.mv-cell--customer {
+  color: var(--accent-customer);
+  font-weight: 500;
+}
+.mv-cell--product {
+  color: var(--text-primary);
+}
+.mv-cell--date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
