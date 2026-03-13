@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactions } from '../features/rewards/services/transactionService';
 import { calculateRewards } from '../features/rewards/utils/rewardCalculator';
+import useAnimateIn from '../hooks/useAnimateIn';
 
 const COLUMNS = [
   { key: 'product',    label: 'Product'   },
@@ -16,6 +17,10 @@ const TransactionView = () => {
   const [filter, setFilter]             = useState('');
   const [sortKey, setSortKey]           = useState('date');
   const [sortDir, setSortDir]           = useState('desc');
+
+  // Triggers after the first two animation frames so amt-bar CSS transition
+  // animates from width 0 → target width rather than snapping to final state.
+  const animated = useAnimateIn();
 
   useEffect(() => {
     getTransactions()
@@ -93,7 +98,7 @@ const TransactionView = () => {
             </tr>
           </thead>
           <tbody>
-            {rows.map((tx) => {
+            {rows.map((tx, idx) => {
               // Mirror the pts-bar backgroundSize trick: the gradient spans the
               // full column width so a $55 bar shows amber-to-slight-yellow while
               // a $200 bar (the max) shows the full amber→green arc.
@@ -103,12 +108,20 @@ const TransactionView = () => {
                 ? `${Math.round(10000 / rawAmtPct)}% 100%`
                 : '10000% 100%';
               return (
-                <tr key={tx.transactionId} className="tx-row">
+                <tr
+                  key={tx.transactionId}
+                  className="tx-row anim-fade-up"
+                  style={{ '--anim-delay': `${idx * 25}ms` }}
+                >
                   <td className="tx-cell tx-cell--product">{tx.product}</td>
                   <td className="tx-cell">{tx.customerId}</td>
                   <td className="tx-cell">
                     <div className="amt-cell">
-                      <div className="amt-bar" style={{ width: `${barPct}%`, backgroundSize: amtBgSize }} aria-hidden="true" />
+                      <div
+                        className="amt-bar"
+                        style={{ width: animated ? `${barPct}%` : '0%', backgroundSize: amtBgSize }}
+                        aria-hidden="true"
+                      />
                       <span className="amt-num">${tx.amount.toFixed(2)}</span>
                     </div>
                   </td>

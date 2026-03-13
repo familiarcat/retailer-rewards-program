@@ -106,6 +106,109 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   100% { background-position: -200% center; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   ANIMATION SYSTEM
+   Single source of keyframes + utility classes.
+   All timing is co-ordinated with useViewTransition.js (OUTRO_MS = 230,
+   INTRO_CLEAR_MS = 440) so CSS durations stay in sync with JS delays.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+
+/* View-level: entire content area transitions */
+@keyframes viewEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes viewExit {
+  from { opacity: 1; transform: translateY(0);   }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+/* Card / row entrance — slides up from slightly below */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Heading / title entrance — slides in from the left */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+/* Header / logo — slides down from slightly above */
+@keyframes headerSlideDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+/* Simple fade — glass panels, overlays */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Glass panel reveal — fades in with a subtle scale */
+@keyframes glassReveal {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: scale(1);     }
+}
+
+/* ── View wrapper ────────────────────────────────────────────────────── */
+.view-wrap {
+  min-height: 0;
+  will-change: opacity, transform;
+}
+.view-wrap--entering {
+  animation: viewEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.view-wrap--exiting {
+  animation: viewExit 0.22s ease-in both;
+  pointer-events: none; /* block clicks during exit */
+}
+
+/* ── Component animation utilities ───────────────────────────────────── */
+
+/*
+ * .anim-fade-up  — staggered card / row entrance.
+ * Set --anim-delay inline to stagger siblings:
+ *   style={{ '--anim-delay': `${i * 80}ms` }}
+ */
+.anim-fade-up {
+  animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) var(--anim-delay, 0ms) both;
+}
+
+/*
+ * .anim-slide-left  — page titles, section headings.
+ */
+.anim-slide-left {
+  animation: slideInLeft 0.42s cubic-bezier(0.16, 1, 0.3, 1) var(--anim-delay, 0ms) both;
+}
+
+/*
+ * .anim-header  — plays once when the app first loads.
+ * Applied to the <header> element; never re-triggers since the header
+ * never unmounts.
+ */
+.anim-header {
+  animation: headerSlideDown 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/*
+ * .anim-fade-in  — generic opacity-only fade (glass panels, filter notices).
+ */
+.anim-fade-in {
+  animation: fadeIn 0.45s ease var(--anim-delay, 0ms) both;
+}
+
+/*
+ * .anim-glass-reveal  — subtle scale + fade for glass panel containers.
+ */
+.anim-glass-reveal {
+  animation: glassReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) var(--anim-delay, 0ms) both;
+}
+
 /* ── Focus ring — high visibility ────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--accent-indigo);
@@ -171,7 +274,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .page-title {
   font-family: 'Inter', sans-serif;
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.02em;
   /* 1.3 line-height + padding-bottom gives Playfair's descenders (g, y, p)
      room to render fully — clip is caused by -webkit-background-clip: text
@@ -747,6 +850,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   flex-direction: column;
   gap: 1.35rem;
   padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .customer-section {
@@ -818,7 +922,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--accent-rewards);
+  color: #c8b8a2;
 }
 
 /*
@@ -836,7 +940,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   color: #ffffff;
 }
 .rewards-table th:first-child {
-  color: var(--accent-indigo);
+  color: #c8b8a2;
 }
 
 .rewards-table th:last-child,
@@ -844,7 +948,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background-color: rgba(251, 191, 36, 0.07);
 }
 .rewards-table th:last-child {
-  color: var(--accent-amber);
+  color: #c8b8a2;
 }
 
 .rewards-table td {
@@ -964,6 +1068,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   flex-direction: column;
   gap: 1.1rem;
   padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .tx-toolbar {
@@ -1025,7 +1130,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted); /* bumped from --text-dim */
+  color: #c8b8a2;
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
@@ -1080,7 +1185,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   border-right: 1px solid rgba(165, 180, 252, 0.12);
   color: #ffffff;
 }
-.tx-table th:nth-child(1) { color: var(--accent-indigo); }
+.tx-table th:nth-child(1) { color: #c8b8a2; }
 
 .tx-table th:nth-child(2),
 .tx-table td:nth-child(2) {
@@ -1101,7 +1206,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .tx-table td:nth-child(5) {
   background-color: rgba(251, 191, 36, 0.07);
 }
-.tx-table th:nth-child(5) { color: var(--accent-amber); }
+.tx-table th:nth-child(5) { color: #c8b8a2; }
 
 /* Amount cell with micro-bar */
 .amt-cell {

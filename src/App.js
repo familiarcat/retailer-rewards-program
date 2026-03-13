@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dashboard       from './components/Dashboard';
 import TransactionView from './components/TransactionView';
 import CustomerRewards from './features/rewards/components/CustomerRewards';
+import useViewTransition from './hooks/useViewTransition';
 import './styles/global.css';
 
 // Human-readable label for every routable sub-view.
@@ -19,10 +20,10 @@ function App() {
   const [view,   setView]   = useState('home');
   const [filter, setFilter] = useState(null);
 
+  // Animation hook — single source of view transition behaviour.
+  const { phase, wrap, enter } = useViewTransition();
+
   // ── History API bootstrap ────────────────────────────────────────────────
-  // Replace the initial browser history entry so that pressing Back on the
-  // home view exits the app to whatever page the user came from rather than
-  // creating a loop inside the application.
   useEffect(() => {
     window.history.replaceState(
       { view: 'home', filter: null },
@@ -32,15 +33,17 @@ function App() {
   }, []);
 
   // Handle browser Back / Forward buttons.
+  // State changes immediately (browser already moved); we just trigger the intro.
   useEffect(() => {
     const onPopState = (e) => {
       const state = e.state || { view: 'home', filter: null };
       setView(state.view   || 'home');
       setFilter(state.filter || null);
+      enter(); // play the intro animation on the newly revealed content
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
-  }, []);
+  }, [enter]);
 
   // Keep the browser tab title in sync with the current view.
   useEffect(() => {
@@ -51,17 +54,19 @@ function App() {
   }, [view]);
 
   // ── Navigation ────────────────────────────────────────────────────────────
-  // Every call to navigate() pushes a new browser history entry so the Back
-  // button traverses the in-app history before leaving the application.
+  // wrap() plays the outro on current content, then executes the state change,
+  // then plays the intro on the new content — all co-ordinated by the hook.
   const navigate = (target, customerFilter = null) => {
-    const nextView = target || 'home';
-    window.history.pushState(
-      { view: nextView, filter: customerFilter },
-      '',
-      window.location.pathname + (nextView !== 'home' ? `#${nextView}` : '')
-    );
-    setView(nextView);
-    setFilter(customerFilter);
+    wrap(() => {
+      const nextView = target || 'home';
+      window.history.pushState(
+        { view: nextView, filter: customerFilter },
+        '',
+        window.location.pathname + (nextView !== 'home' ? `#${nextView}` : '')
+      );
+      setView(nextView);
+      setFilter(customerFilter);
+    });
   };
 
   const crumbLabel = VIEW_LABELS[view];
@@ -70,9 +75,9 @@ function App() {
   return (
     <div className="app-container">
 
-      {/* ── Breadcrumb — rendered above the header glass panel ── */}
+      {/* ── Breadcrumb — animates in when a sub-view is active ── */}
       {crumbLabel && (
-        <nav className="breadcrumb" aria-label="You are here">
+        <nav className="breadcrumb anim-slide-left" aria-label="You are here">
           <button
             className="breadcrumb__home"
             onClick={() => navigate('home')}
@@ -86,8 +91,8 @@ function App() {
         </nav>
       )}
 
-      {/* ── App header — always visible ── */}
-      <header className="app-header">
+      {/* ── App header — anim-header plays once on initial load ── */}
+      <header className="app-header anim-header">
         <div className="app-header-left">
           <span className="app-logo" aria-hidden="true">◈</span>
           <div className="app-header-text">
@@ -99,7 +104,6 @@ function App() {
               onKeyDown={view !== 'home' ? (e) => e.key === 'Enter' && navigate('home') : undefined}
               title={view !== 'home' ? 'Back to dashboard' : undefined}
             >
-              {/* Two-level typographic contrast: micro eyebrow + oversized wordmark */}
               <span className="app-brand__eyebrow">Retailer</span>
               <span className="app-brand__wordmark">Rewards</span>
             </h1>
@@ -107,15 +111,15 @@ function App() {
         </div>
       </header>
 
-      {/* ── Sub-view page title — shown beneath the header on non-home views ── */}
+      {/* ── Sub-view page title — slides in from the left when it appears ── */}
       {crumbLabel && (
-        <div className="page-header">
+        <div className="page-header anim-slide-left" style={{ '--anim-delay': '60ms' }}>
           <h2 className="page-title">{crumbLabel}</h2>
         </div>
       )}
 
-      {/* ── Main content ── */}
-      <main>
+      {/* ── Main content — view-wrap class drives the transition phase ── */}
+      <main className={`view-wrap view-wrap--${phase}`}>
         {view === 'home'         && <Dashboard onNavigate={navigate} />}
         {view === 'rewards'      && <CustomerRewards filterCustomerId={filter} />}
         {view === 'transactions' && <TransactionView />}

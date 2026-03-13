@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRewards } from '../features/rewards/hooks/useRewards';
 import { getTransactions } from '../features/rewards/services/transactionService';
 
-// ── Navigation modules (only views that exist) ────────────────────────────────
+// ── Navigation modules ────────────────────────────────────────────────────────
 
 const MODULES = [
   {
@@ -24,11 +24,10 @@ const MODULES = [
 ];
 
 // Per-customer label accent colours — used for the customer name text only.
-// The bars themselves always use the amber→green "points earned" gradient.
 const CHART_LABEL_COLORS = ['#a5b4fc', '#5eead4', '#f9a8d4'];
 const PTS_GRADIENT = 'linear-gradient(90deg, #fbbf24 0%, #34d399 100%)';
 
-// ── KPI configuration — maps each card to a destination view ─────────────────
+// ── KPI configuration ─────────────────────────────────────────────────────────
 
 const KPI_DEFS = [
   { label: 'Customers',            accent: '#a5b4fc', navigateTo: 'rewards',       hint: 'View rewards catalog' },
@@ -39,10 +38,15 @@ const KPI_DEFS = [
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-const KpiCard = ({ label, value, loading, accent, navigateTo, hint, onNavigate }) => (
+// animIndex drives the stagger delay: each card enters 80ms after the previous.
+const KpiCard = ({ label, value, loading, accent, navigateTo, hint, onNavigate, animIndex = 0 }) => (
   <div
-    className="kpi-card kpi-card--clickable"
-    style={{ '--kpi-accent': accent, borderTopColor: accent }}
+    className="kpi-card kpi-card--clickable anim-fade-up"
+    style={{
+      '--kpi-accent': accent,
+      borderTopColor: accent,
+      '--anim-delay': `${animIndex * 80}ms`,
+    }}
     onClick={() => onNavigate(navigateTo)}
     role="button"
     tabIndex={0}
@@ -88,26 +92,22 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
         return (
           <div
             key={r.customerId}
-            className="pchart-row pchart-row--clickable"
+            // Stagger each customer row; base delay offset after KPI cards settle.
+            className="pchart-row pchart-row--clickable anim-fade-up"
+            style={{ '--anim-delay': `${i * 70 + 160}ms` }}
             onClick={() => onNavigate('rewards', r.customerId)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onNavigate('rewards', r.customerId)}
             aria-label={`${r.customerId}: ${r.totalPoints} points. Click to view their rewards.`}
           >
-            {/* Customer name keeps per-customer accent for differentiation */}
             <span className="pchart-label" style={{ color: labelColor }}>{r.customerId}</span>
-            <div
-              className="pchart-track"
-              aria-hidden="true"
-            >
-              {/* Bar always uses the amber→green "points earned" gradient */}
+            <div className="pchart-track" aria-hidden="true">
               <div
                 className="pchart-fill"
                 style={{ width: `${pct}%`, background: PTS_GRADIENT }}
               />
             </div>
-            {/* Value in emerald — points are always represented in money-green */}
             <span className="pchart-val" style={{ color: '#34d399' }}>{r.totalPoints.toLocaleString()}</span>
           </div>
         );
@@ -116,10 +116,15 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
   );
 };
 
-const ModuleTile = ({ mod, onNavigate }) => (
+// animIndex drives the stagger; modules enter after the KPI row settles.
+const ModuleTile = ({ mod, onNavigate, animIndex = 0 }) => (
   <div
-    className="mod-tile"
-    style={{ '--tile-accent': mod.accent, '--tile-glow': mod.glow }}
+    className="mod-tile anim-glass-reveal"
+    style={{
+      '--tile-accent': mod.accent,
+      '--tile-glow': mod.glow,
+      '--anim-delay': `${animIndex * 100 + 80}ms`,
+    }}
     onClick={() => onNavigate(mod.id)}
     role="button"
     tabIndex={0}
@@ -146,7 +151,6 @@ const Dashboard = ({ onNavigate }) => {
   const { rewards, loading: rewardsLoading } = useRewards();
   const [transactions, setTransactions]       = useState([]);
   const [txLoading, setTxLoading]             = useState(true);
-  // TODO: wire up customer search — const [search, setSearch] = useState('');
 
   useEffect(() => {
     getTransactions()
@@ -158,25 +162,13 @@ const Dashboard = ({ onNavigate }) => {
   const monthCount  = new Set(transactions.map((t) => t.date.slice(0, 7))).size;
   const recent      = [...transactions].reverse().slice(0, 4);
 
-  const kpiValues = [
-    rewards.length,
-    transactions.length,
-    totalPoints.toLocaleString(),
-    monthCount,
-  ];
-
+  const kpiValues  = [rewards.length, transactions.length, totalPoints.toLocaleString(), monthCount];
   const kpiLoading = [rewardsLoading, txLoading, rewardsLoading, txLoading];
-
-  // TODO: customer search handler — navigates to rewards view with a filter
-  // const handleSearch = (e) => {
-  //   e.preventDefault();
-  //   onNavigate('rewards', search.trim() || null);
-  // };
 
   return (
     <div className="dashboard">
 
-      {/* ── KPI strip ── */}
+      {/* ── KPI strip — cards stagger in 80ms apart ── */}
       <div className="kpi-row">
         {KPI_DEFS.map((def, i) => (
           <KpiCard
@@ -188,41 +180,32 @@ const Dashboard = ({ onNavigate }) => {
             navigateTo={def.navigateTo}
             hint={def.hint}
             onNavigate={onNavigate}
+            animIndex={i}
           />
         ))}
       </div>
-
-      {/* TODO: customer search by ID — uncomment when customer lookup view is implemented
-      <form className="dash-search" onSubmit={handleSearch} role="search">
-        <input
-          type="search"
-          className="dash-search__input"
-          placeholder="Search customer rewards by ID…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search customers"
-        />
-        <button type="submit" className="dash-search__btn">
-          {search.trim() ? 'Find Customer →' : 'View All →'}
-        </button>
-      </form>
-      */}
 
       {/* ── Body: modules + points chart ── */}
       <div className="dash-body">
 
         <section className="dash-section">
-          <h2 className="dash-section__heading">Portal Modules</h2>
+          {/* Heading slides in from the left, slightly after the KPI strip */}
+          <h2 className="dash-section__heading anim-slide-left" style={{ '--anim-delay': '100ms' }}>
+            Portal Modules
+          </h2>
           <div className="mod-grid">
-            {MODULES.map((mod) => (
-              <ModuleTile key={mod.id} mod={mod} onNavigate={onNavigate} />
+            {MODULES.map((mod, i) => (
+              <ModuleTile key={mod.id} mod={mod} onNavigate={onNavigate} animIndex={i} />
             ))}
           </div>
         </section>
 
         <section className="dash-section">
-          <h2 className="dash-section__heading">Points by Customer</h2>
-          <div className="glass-panel">
+          <h2 className="dash-section__heading anim-slide-left" style={{ '--anim-delay': '120ms' }}>
+            Points by Customer
+          </h2>
+          {/* Glass panel fades in as a unit */}
+          <div className="glass-panel anim-glass-reveal" style={{ '--anim-delay': '160ms' }}>
             <CustomerPointsChart
               rewards={rewards}
               loading={rewardsLoading}
@@ -233,17 +216,20 @@ const Dashboard = ({ onNavigate }) => {
 
       </div>
 
-      {/* ── Recent transactions ── */}
+      {/* ── Recent transactions — rows stagger in after the body section ── */}
       <section className="dash-section">
-        <h2 className="dash-section__heading">Recent Transactions</h2>
+        <h2 className="dash-section__heading anim-slide-left" style={{ '--anim-delay': '200ms' }}>
+          Recent Transactions
+        </h2>
         {txLoading ? (
           <p className="loading">Loading…</p>
         ) : (
           <div className="recent-list">
-            {recent.map((tx) => (
+            {recent.map((tx, i) => (
               <div
                 key={tx.transactionId}
-                className="recent-row recent-row--clickable"
+                className="recent-row recent-row--clickable anim-fade-up"
+                style={{ '--anim-delay': `${i * 50 + 220}ms` }}
                 onClick={() => onNavigate('transactions')}
                 role="button"
                 tabIndex={0}

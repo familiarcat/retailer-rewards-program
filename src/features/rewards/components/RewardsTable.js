@@ -1,4 +1,5 @@
 import React from 'react';
+import useAnimateIn from '../../../hooks/useAnimateIn';
 
 /**
  * Presentational component that displays monthly reward breakdown
@@ -7,6 +8,10 @@ import React from 'react';
  * @param {{ rewards: Array<{ month: string, points: number }>, totalPoints: number }} props
  */
 const RewardsTable = ({ rewards = [], totalPoints = 0 }) => {
+  // Triggers after the first two animation frames so CSS transition animates
+  // the bar from width: 0 → target width rather than jumping to final state.
+  const animated = useAnimateIn();
+
   if (!rewards.length) {
     return (
       <div className="rewards-table">
@@ -28,7 +33,7 @@ const RewardsTable = ({ rewards = [], totalPoints = 0 }) => {
           </tr>
         </thead>
         <tbody>
-          {rewards.map(({ month, points }) => {
+          {rewards.map(({ month, points }, idx) => {
             // rawPct = true proportion of this row's points vs the highest month.
             // barPct = visual bar width (minimum 4px-equivalent so zero shows a stub).
             const rawPct = Math.round((points / maxPts) * 100);
@@ -36,21 +41,25 @@ const RewardsTable = ({ rewards = [], totalPoints = 0 }) => {
 
             // backgroundSize trick: the gradient is always drawn at full-track width,
             // so the bar's clipped width reveals only the correct amber→green slice.
-            // A 100-pt bar (100%) shows the full amber→green span.
-            // A 25-pt bar (28%) shows only the amber→pale-yellow slice.
-            // A 0-pt bar (min stub) shows pure amber — no green reached yet.
             const bgSize = rawPct > 0
               ? `${Math.round(10000 / rawPct)}% 100%`
               : '10000% 100%';
 
             return (
-              <tr key={month}>
+              <tr
+                key={month}
+                className="anim-fade-up"
+                style={{ '--anim-delay': `${idx * 40}ms` }}
+              >
                 <td>{month}</td>
                 <td className="rw-td-pts">
                   <div className="pts-visual">
                     <div
                       className="pts-bar"
-                      style={{ width: `${barPct}%`, backgroundSize: bgSize }}
+                      style={{
+                        width: animated ? `${barPct}%` : '0%',
+                        backgroundSize: bgSize,
+                      }}
                       aria-hidden="true"
                     />
                     <span className="pts-num">{points}</span>

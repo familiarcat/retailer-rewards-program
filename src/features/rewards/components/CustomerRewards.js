@@ -44,8 +44,12 @@ const CustomerRewards = ({ filterCustomerId = null }) => {
           Showing results for <strong>{filterCustomerId}</strong>
         </p>
       )}
-      {visible.map((customer) => (
-        <section key={customer.customerId} className="customer-section">
+      {visible.map((customer, i) => (
+        <section
+          key={customer.customerId}
+          className="customer-section anim-fade-up"
+          style={{ '--anim-delay': `${i * 120}ms` }}
+        >
           <h2 className="customer-id">{customer.customerId}</h2>
           <RewardsTable
             rewards={customer.monthlyRewards}
