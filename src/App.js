@@ -56,18 +56,28 @@ function App() {
   // ── Navigation ────────────────────────────────────────────────────────────
   // wrap() plays the outro on current content, then executes the state change,
   // then plays the intro on the new content — all co-ordinated by the hook.
-  const navigate = (target, customerFilter = null) => {
+  // `viewFilter` can be a string (customerFilter for rewards) or an object
+  // { customerId, month } for a month-scoped transaction drill-through.
+  const navigate = (target, viewFilter = null) => {
     wrap(() => {
       const nextView = target || 'home';
       window.history.pushState(
-        { view: nextView, filter: customerFilter },
+        { view: nextView, filter: viewFilter },
         '',
         window.location.pathname + (nextView !== 'home' ? `#${nextView}` : '')
       );
       setView(nextView);
-      setFilter(customerFilter);
+      setFilter(viewFilter);
     });
   };
+
+  // Called from CustomerRewards → RewardsTable when a month row is clicked.
+  // Navigates to the transaction log pre-filtered to that customer + month.
+  const handleMonthClick = (customerId, month) =>
+    navigate('transactions', { customerId, month });
+
+  // Clears the transaction month filter while staying on the transaction view.
+  const handleClearTxFilter = () => navigate('transactions', null);
 
   const crumbLabel = VIEW_LABELS[view];
   const crumbIcon  = VIEW_ICONS[view];
@@ -121,8 +131,18 @@ function App() {
       {/* ── Main content — view-wrap class drives the transition phase ── */}
       <main className={`view-wrap view-wrap--${phase}`}>
         {view === 'home'         && <Dashboard onNavigate={navigate} />}
-        {view === 'rewards'      && <CustomerRewards filterCustomerId={filter} />}
-        {view === 'transactions' && <TransactionView />}
+        {view === 'rewards'      && (
+          <CustomerRewards
+            filterCustomerId={filter}
+            onMonthClick={handleMonthClick}
+          />
+        )}
+        {view === 'transactions' && (
+          <TransactionView
+            txFilter={filter && typeof filter === 'object' ? filter : null}
+            onClearFilter={handleClearTxFilter}
+          />
+        )}
       </main>
 
     </div>

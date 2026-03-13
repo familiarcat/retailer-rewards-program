@@ -224,24 +224,39 @@ const Dashboard = ({ onNavigate }) => {
         {txLoading ? (
           <p className="loading">Loading…</p>
         ) : (
-          <div className="recent-list">
-            {recent.map((tx, i) => (
-              <div
-                key={tx.transactionId}
-                className="recent-row recent-row--clickable anim-fade-up"
-                style={{ '--anim-delay': `${i * 50 + 220}ms` }}
-                onClick={() => onNavigate('transactions')}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onNavigate('transactions')}
-                aria-label={`${tx.product} by ${tx.customerId}, $${tx.amount.toFixed(2)}. Click to view all transactions.`}
-              >
-                <span className="recent-row__product">{tx.product}</span>
-                <span className="recent-row__customer">{tx.customerId}</span>
-                <span className="recent-row__amount">${tx.amount.toFixed(2)}</span>
-                <span className="recent-row__date">{tx.date}</span>
-              </div>
-            ))}
+          <div className="recent-table-outer anim-glass-reveal" style={{ '--anim-delay': '240ms' }}>
+            <div className="recent-table-wrap">
+              <table className="recent-table">
+                <caption className="rw-caption">Recent Transactions</caption>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recent.map((tx, i) => (
+                    <tr
+                      key={tx.transactionId}
+                      className="recent-row recent-row--clickable anim-fade-up"
+                      style={{ '--anim-delay': `${i * 50 + 300}ms` }}
+                      onClick={() => onNavigate('transactions')}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onNavigate('transactions')}
+                      aria-label={`${tx.product} by ${tx.customerId}, $${tx.amount.toFixed(2)}. Click to view all transactions.`}
+                    >
+                      <td className="recent-cell recent-cell--product">{tx.product}</td>
+                      <td className="recent-cell recent-cell--customer">{tx.customerId}</td>
+                      <td className="recent-cell recent-cell--amount">${tx.amount.toFixed(2)}</td>
+                      <td className="recent-cell recent-cell--date">{tx.date}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <button
               className="recent-view-all"
               onClick={() => onNavigate('transactions')}

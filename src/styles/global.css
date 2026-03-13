@@ -3,15 +3,59 @@
    ══════════════════════════════════════════════════════════════════════ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap');
 
+/*
+ * Animatable custom properties — registered so the browser can interpolate
+ * them as typed values rather than discrete string swaps.
+ *
+ * --aurora-hue:       cycles through the orb hues (indigo→violet→teal→pink)
+ * --aurora-alpha:     border opacity peaks when orbs are brightest (luminosity)
+ * --aurora-alpha-dim: dimmer border variant, stays proportionally lower
+ *
+ * All three are declared with inherits:true so one animation on :root
+ * propagates updated border colour to every component that uses
+ * var(--glass-border) or var(--glass-border-dim).
+ */
+@property --aurora-hue {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 240deg;
+}
+@property --aurora-alpha {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0.18;
+}
+@property --aurora-alpha-dim {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0.07;
+}
+
 :root {
+  /* ── Aurora state (animated — drives border luminosity) ─────────────
+   * These are the initial values; @keyframes auroraShift overrides them.
+   * The animation is placed on :root so inherited custom properties
+   * reach every child in a single cascade.                              */
+  --aurora-hue:        240deg;
+  --aurora-alpha:      0.18;
+  --aurora-alpha-dim:  0.07;
+
   /* Glass surfaces — 30% white per spec */
   --glass-bg:          rgba(255, 255, 255, 0.30);
   --glass-bg-deep:     rgba(255, 255, 255, 0.12);
   --glass-bg-subtle:   rgba(255, 255, 255, 0.05);
-  --glass-border:      rgba(255, 255, 255, 0.18);
-  --glass-border-dim:  rgba(255, 255, 255, 0.07);
+  /*
+   * Borders tinted by the ambient aurora: hue tracks the dominant orb
+   * colour; alpha brightens when orbs are most luminous so the glass
+   * panels visually "reflect" whatever is glowing behind them.
+   */
+  --glass-border:      hsl(var(--aurora-hue) 55% 78% / var(--aurora-alpha));
+  --glass-border-dim:  hsl(var(--aurora-hue) 55% 78% / var(--aurora-alpha-dim));
   --glass-blur:        20px;
   --glass-blur-sm:     12px;
+
+  /* Drive the aurora shift — same period as the orb drift animation    */
+  animation: auroraShift 26s ease-in-out infinite alternate;
 
   /* Pastel accents — dark mode optimised */
   --accent-indigo:  #a5b4fc;
@@ -45,6 +89,27 @@
   --radius-card: 14px;
   --radius-sm:   8px;
   --gap-section: 1.5rem;
+
+  /*
+   * Two-tier horizontal indentation system
+   * ─────────────────────────────────────
+   * Tier 0 — viewport edge
+   * Tier 1 — --layout-gutter   (1.75rem)
+   *   Applied to: app-container, app-header internal padding.
+   *   Anchors: breadcrumb, page title, dashboard cards.
+   *   These are the "parent" nodes in the visual hierarchy.
+   *
+   * Tier 2 — + --view-indent   (additional 1.25rem inside Tier 1)
+   *   Applied to: .customer-rewards, .tx-view (the sub-view content areas).
+   *   Anchors: customer cards, filter bar, transaction table.
+   *   These are the "child" nodes — indented to communicate that they
+   *   belong under / are governed by the page title above them.
+   *
+   * A left accent line on each sub-view wrapper makes the parent→child
+   * relationship explicit without requiring extra DOM elements.
+   */
+  --layout-gutter: 1.75rem;
+  --view-indent:   1.25rem;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────── */
@@ -82,6 +147,39 @@ body::before {
   background-size: 28px 28px;
 }
 
+/*
+ * Animated orb layer — a second set of colour orbs that slowly drifts,
+ * breathes, and rotates through the hue spectrum, creating the sense
+ * that the glassmorphic background is alive and transparent.
+ *
+ * The layer is sized at 160% × 160% of the viewport and anchored at
+ * top: -30% / left: -30% so the orbs stay fully in frame even when
+ * translate pushes the canvas ±8–10% of its own dimensions.
+ *
+ * hue-rotate() shifts the whole palette over time; scale() breathes
+ * the intensity; translate() creates the slow spatial drift.
+ * Crucially, the animation duration matches auroraShift (26s alternate)
+ * so the border luminosity and the background orbs stay phase-locked.
+ */
+body::after {
+  content: '';
+  position: fixed;
+  top:  -30%;
+  left: -30%;
+  width:  160%;
+  height: 160%;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform, filter;
+  background-image:
+    radial-gradient(ellipse 55% 45% at 22% 28%,  rgba(99,  102, 241, 0.18) 0%, transparent 52%),
+    radial-gradient(ellipse 45% 55% at 78% 68%,  rgba(168,  85, 247, 0.14) 0%, transparent 52%),
+    radial-gradient(ellipse 40% 38% at 62% 12%,  rgba(20,  184, 166, 0.11) 0%, transparent 52%),
+    radial-gradient(ellipse 35% 48% at 18% 82%,  rgba(251, 191,  36, 0.09) 0%, transparent 52%),
+    radial-gradient(ellipse 50% 42% at 50% 50%,  rgba(236,  72, 153, 0.07) 0%, transparent 50%);
+  animation: orbDrift 26s ease-in-out infinite alternate;
+}
+
 h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /* Custom scrollbar */
@@ -104,6 +202,55 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 @keyframes shimmer {
   0%   { background-position:  200% center; }
   100% { background-position: -200% center; }
+}
+
+/*
+ * orbDrift — moves the body::after orb canvas across the viewport so
+ * the colour wash appears to breathe and shift with organic motion.
+ * translate() percentages are relative to the element (160 vw/vh), so
+ * ±8% of 160vw ≈ ±13vw of actual movement — visible but not jarring.
+ * hue-rotate() gently cycles the entire palette; scale() softly pulses
+ * the orb intensity. Duration and alternate timing mirror auroraShift
+ * so background motion and border luminosity stay phase-locked.
+ */
+@keyframes orbDrift {
+  0%   { transform: translate(  0%,    0%)   scale(1.00); filter: hue-rotate(  0deg); opacity: 1.00; }
+  15%  { transform: translate(  5%,  -4%)   scale(1.04); filter: hue-rotate( 12deg); opacity: 0.88; }
+  30%  { transform: translate(  8%,   3%)   scale(1.02); filter: hue-rotate( 25deg); opacity: 0.94; }
+  45%  { transform: translate(  3%,   8%)   scale(0.97); filter: hue-rotate( -8deg); opacity: 0.90; }
+  60%  { transform: translate( -5%,   5%)   scale(1.03); filter: hue-rotate( 18deg); opacity: 0.85; }
+  75%  { transform: translate( -7%,  -3%)   scale(0.99); filter: hue-rotate(-15deg); opacity: 0.92; }
+  90%  { transform: translate( -2%,  -7%)   scale(1.02); filter: hue-rotate( 30deg); opacity: 0.88; }
+  100% { transform: translate(  6%,  -6%)   scale(1.01); filter: hue-rotate(  8deg); opacity: 0.95; }
+}
+
+/*
+ * auroraShift — animates --aurora-hue, --aurora-alpha, --aurora-alpha-dim
+ * on :root. Because all three are @property registered (typed, inheritable),
+ * the interpolated values cascade to every child that references
+ * var(--glass-border) or var(--glass-border-dim).
+ *
+ * Hue waypoints match the dominant orb at each animation phase:
+ *   0%  → indigo orb foreground  (240deg)
+ *   25% → violet/purple bloom    (268deg)
+ *   50% → teal orb foreground    (178deg)
+ *   75% → pink/rose glow         (320deg)
+ *   100%→ indigo-violet          (255deg)
+ *
+ * Alpha peaks (0.30) when the orbs are most luminous (25% and 75%),
+ * creating the effect that glass borders brighten as coloured light
+ * passes behind them — luminosity-reactive without any JavaScript.
+ */
+@keyframes auroraShift {
+  0%   { --aurora-hue: 240deg; --aurora-alpha: 0.18; --aurora-alpha-dim: 0.07; }
+  15%  { --aurora-hue: 252deg; --aurora-alpha: 0.24; --aurora-alpha-dim: 0.09; }
+  25%  { --aurora-hue: 268deg; --aurora-alpha: 0.30; --aurora-alpha-dim: 0.13; }
+  40%  { --aurora-hue: 220deg; --aurora-alpha: 0.21; --aurora-alpha-dim: 0.08; }
+  50%  { --aurora-hue: 178deg; --aurora-alpha: 0.26; --aurora-alpha-dim: 0.11; }
+  65%  { --aurora-hue: 195deg; --aurora-alpha: 0.19; --aurora-alpha-dim: 0.07; }
+  75%  { --aurora-hue: 320deg; --aurora-alpha: 0.28; --aurora-alpha-dim: 0.12; }
+  88%  { --aurora-hue: 285deg; --aurora-alpha: 0.23; --aurora-alpha-dim: 0.09; }
+  100% { --aurora-hue: 255deg; --aurora-alpha: 0.20; --aurora-alpha-dim: 0.08; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -222,7 +369,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   z-index: 1;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 1.75rem 1.5rem 3rem;
+  padding: 1.75rem var(--layout-gutter) 3rem;
 }
 
 /* ── Breadcrumb — floats above the header glass panel ───────────────── */
@@ -231,7 +378,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.6rem;
-  padding: 0 0.2rem;
+  padding: 0;
 }
 
 .breadcrumb__home {
@@ -267,8 +414,14 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
  * Gradient starts at amber and deepens — same warm family as the wordmark but
  * without the cream-white lead-in, signalling a tier-two heading clearly.
  */
+/*
+ * The page header sits at Tier 1 (the --layout-gutter rail) and acts as
+ * the visual parent of the sub-view content below it. The bottom margin
+ * is tighter than a full section gap so the title "claims" its content
+ * without leaving a large empty band between heading and cards.
+ */
 .page-header {
-  margin: 1.35rem 0 1.1rem;
+  margin: 1.35rem 0 0.75rem;
 }
 
 .page-title {
@@ -301,7 +454,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 2rem;
-  padding: 1.1rem 1.6rem;
+  padding: 1.1rem var(--layout-gutter);
   border-radius: var(--radius-card);
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
@@ -757,40 +910,117 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .pchart-skeleton .pchart-track { animation: shimmer 1.6s ease-in-out infinite; }
 .pchart-skeleton .pchart-val   { background: var(--glass-bg-deep); height: 10px; width: 28px; border-radius: 3px; margin-left: auto; }
 
-/* ── Recent transactions strip ───────────────────────────────────────── */
-.recent-list { display: flex; flex-direction: column; gap: 0.35rem; }
+/* ── Recent transactions table ───────────────────────────────────────── */
 
-.recent-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto auto;
-  align-items: center;
+/*
+ * Outer glass panel — mirrors the .glass-panel used for Points by Customer
+ * so both dashboard sections share the same surface treatment.
+ */
+.recent-table-outer {
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  padding-bottom: 0.85rem;
+}
+
+/* Scroll wrapper keeps the table constrained on narrow viewports */
+.recent-table-wrap {
+  overflow-x: auto;
+}
+
+.recent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.855rem;
+}
+
+/* ── Table header ────────────────────────────────────────────────────── */
+.recent-table th {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
   background: var(--glass-bg-deep);
-  backdrop-filter: blur(var(--glass-blur-sm));
-  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
-  border: 1px solid var(--glass-border-dim);
-  border-radius: var(--radius-sm);
-  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--glass-border);
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #c8b8a2;         /* universal beige, matching tx-table / rewards-table */
+}
+
+/* ── Table cells ─────────────────────────────────────────────────────── */
+.recent-table td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--glass-border-dim);
+  vertical-align: middle;
+  color: var(--text-secondary);
   font-size: 0.82rem;
-  transition: background 0.12s, border-color 0.12s;
 }
-.recent-row--clickable { cursor: pointer; }
+.recent-table tbody tr:last-child td { border-bottom: none; }
 
-.recent-row:hover,
+/* ── Alternating row stripes — matches tx-table rhythm ──────────────── */
+.recent-table tbody tr:nth-child(odd)  { background: rgba(251, 191, 36, 0.06); }
+.recent-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
+
+/* ── Per-column background tints ─────────────────────────────────────
+ * Col 1  Product  — indigo  (entity identity, cool anchor)
+ * Col 2  Customer — violet  (owner association)
+ * Col 3  Amount   — teal    (transactional value)
+ * Col 4  Date     — slate   (temporal, neutral)
+ * Opacities kept low so tints layer cleanly over the row stripes.      */
+.recent-table th:nth-child(1),
+.recent-table td:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.07);
+  border-right: 1px solid rgba(165, 180, 252, 0.12);
+  color: #ffffff;
+}
+.recent-table th:nth-child(1) { color: #c8b8a2; }
+
+.recent-table th:nth-child(2),
+.recent-table td:nth-child(2) {
+  background-color: rgba(196, 181, 253, 0.05);
+}
+
+.recent-table th:nth-child(3),
+.recent-table td:nth-child(3) {
+  background-color: rgba(94, 234, 212, 0.05);
+}
+
+.recent-table th:nth-child(4),
+.recent-table td:nth-child(4) {
+  background-color: rgba(148, 163, 184, 0.04);
+}
+
+/* ── Cell-level type treatment ───────────────────────────────────────── */
+.recent-cell--product  { font-weight: 600; color: var(--text-primary) !important; }
+.recent-cell--customer { color: var(--accent-indigo) !important; font-weight: 500; }
+.recent-cell--amount   { font-weight: 700; color: var(--text-primary) !important; font-variant-numeric: tabular-nums; }
+.recent-cell--date     { color: var(--text-dim) !important; font-size: 0.78rem; }
+
+/* ── Clickable row ───────────────────────────────────────────────────── */
+.recent-row--clickable {
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+.recent-row--clickable:hover td {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
 .recent-row--clickable:focus-visible {
-  background: rgba(255,255,255,0.14);
-  border-color: var(--glass-border);
+  outline: none;
 }
-.recent-row--clickable:focus-visible { outline: 2px solid var(--accent-indigo); outline-offset: 2px; }
+.recent-row--clickable:focus-visible td {
+  box-shadow: inset 0 0 0 2px rgba(165, 180, 252, 0.50);
+}
 
-.recent-row__product  { font-weight: 600; color: var(--text-primary); font-size: 0.8rem; }
-.recent-row__customer { font-weight: 600; color: var(--accent-indigo); font-size: 0.8rem; }
-.recent-row__amount   { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-.recent-row__date     { color: var(--text-secondary); font-size: 0.78rem; } /* bumped */
-
+/* ── "View all" footer link ──────────────────────────────────────────── */
 .recent-view-all {
   align-self: flex-start;
-  margin-top: 0.5rem;
+  margin: 0 0.9rem;
   background: none;
   border: none;
   color: var(--accent-indigo);
@@ -803,6 +1033,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   text-underline-offset: 3px;
   opacity: 0.8;
   transition: opacity 0.12s, text-decoration-style 0.12s;
+  font-family: inherit;
 }
 .recent-view-all:hover { opacity: 1; text-decoration-style: solid; }
 
@@ -843,14 +1074,27 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
    REWARDS VIEW
    ══════════════════════════════════════════════════════════════════════ */
 
-/* Slight left indent of customer cards below the "Rewards Catalog" page title,
-   creating a subtle visual relationship between title and content. */
+/*
+ * Customer reward cards — indented by --view-indent to signal that these
+ * cards are children of the "Rewards Catalog" page title above them.
+ *
+ * The left border acts as a visual connector: a faint amber-gradient line
+ * that anchors the content's relationship to the parent heading, the same
+ * way a tree-view line connects a folder to its contents.
+ */
 .customer-rewards {
   display: flex;
   flex-direction: column;
   gap: 1.35rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
+  padding-left: var(--view-indent);
+  padding-right: var(--view-indent);
+  border-left: 2px solid transparent;
+  border-image: linear-gradient(
+    to bottom,
+    rgba(251, 191, 36, 0.45) 0%,
+    rgba(251, 191, 36, 0.12) 60%,
+    transparent 100%
+  ) 1;
 }
 
 .customer-section {
@@ -993,6 +1237,45 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   border-width: 0;
 }
 
+/*
+ * Clickable month row — shown when onMonthClick prop is provided to RewardsTable.
+ * The row acts as a drill-through link to the Transaction Log for that month.
+ * The chevron (›) slides right on hover to reinforce the interactive affordance
+ * without cluttering the default resting state.
+ */
+.rw-row--clickable {
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+.rw-row--clickable:hover,
+.rw-row--clickable:focus-visible {
+  background-color: rgba(251, 191, 36, 0.10) !important;
+  outline: none;
+}
+.rw-row--clickable:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(251, 191, 36, 0.50);
+}
+
+.rw-month-label {
+  display: inline;
+}
+/* Chevron hidden by default — slides into view on row focus/hover */
+.rw-month-chevron {
+  display: inline-block;
+  margin-left: 0.45rem;
+  color: var(--accent-amber);
+  font-size: 1.05rem;
+  line-height: 1;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.rw-row--clickable:hover .rw-month-chevron,
+.rw-row--clickable:focus-visible .rw-month-chevron {
+  opacity: 1;
+  transform: translateX(0);
+}
+
 /* Month points visual cell */
 .rw-td-pts { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
 
@@ -1062,13 +1345,83 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
    TRANSACTION VIEW
    ══════════════════════════════════════════════════════════════════════ */
 
-/* Matches the 1.25rem left indent applied to .customer-rewards */
+/*
+ * Transaction view — indented by --view-indent to signal that the filter
+ * bar, toolbar, and table are children of the "Transaction Log" title.
+ * Matching left accent line uses teal to align with the transactions
+ * colour accent, distinguishing this hierarchy marker from the rewards one.
+ */
 .tx-view {
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
+  padding-left: var(--view-indent);
+  padding-right: var(--view-indent);
+  border-left: 2px solid transparent;
+  border-image: linear-gradient(
+    to bottom,
+    rgba(94, 234, 212, 0.45) 0%,
+    rgba(94, 234, 212, 0.12) 60%,
+    transparent 100%
+  ) 1;
+}
+
+/*
+ * Month drill-through context bar — appears when the Transaction Log is
+ * opened from a RewardsTable month row. Shows customer name + month with
+ * a "View all" dismiss button. Uses the same glass language as other panels
+ * but with an amber accent to tie it back to the points colour system.
+ */
+.tx-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+}
+.tx-filter-bar__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.tx-filter-bar__icon {
+  color: var(--accent-amber);
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+.tx-filter-bar__customer {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.tx-filter-bar__sep {
+  color: var(--text-dim);
+}
+.tx-filter-bar__month {
+  color: var(--accent-amber);
+  font-weight: 600;
+}
+.tx-filter-bar__clear {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 0.22rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+}
+.tx-filter-bar__clear:hover {
+  border-color: rgba(251, 191, 36, 0.45);
+  color: var(--accent-amber);
 }
 
 .tx-toolbar {
@@ -1271,12 +1624,13 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 @media (max-width: 640px) {
-  .app-container  { padding: 1rem 0.9rem 2rem; }
+  .app-container  { padding: 1rem 1rem 2rem; }
   .page-title     { font-size: 1.4rem; }
   .kpi-row        { grid-template-columns: repeat(2, 1fr); }
   .mod-grid       { grid-template-columns: 1fr; }
-  .recent-row     { grid-template-columns: 1fr auto; }
-  .recent-row__date { display: none; }
+  /* Hide the Date column on narrow viewports — least critical data point */
+  .recent-table th:nth-child(4),
+  .recent-table td:nth-child(4) { display: none; }
   .tx-toolbar     { flex-direction: column; align-items: stretch; }
   .pchart-row     { grid-template-columns: 6rem 1fr 3rem; }
 }

@@ -5,9 +5,16 @@ import useAnimateIn from '../../../hooks/useAnimateIn';
  * Presentational component that displays monthly reward breakdown
  * and total points for a single customer.
  *
- * @param {{ rewards: Array<{ month: string, points: number }>, totalPoints: number }} props
+ * @param {{
+ *   rewards: Array<{ month: string, points: number }>,
+ *   totalPoints: number,
+ *   customerId?: string,
+ *   onMonthClick?: (customerId: string, month: string) => void
+ * }} props
+ *   When onMonthClick is provided each row becomes interactive:
+ *   clicking navigates to the Transaction Log filtered to that customer + month.
  */
-const RewardsTable = ({ rewards = [], totalPoints = 0 }) => {
+const RewardsTable = ({ rewards = [], totalPoints = 0, customerId = null, onMonthClick = null }) => {
   // Triggers after the first two animation frames so CSS transition animates
   // the bar from width: 0 → target width rather than jumping to final state.
   const animated = useAnimateIn();
@@ -45,13 +52,25 @@ const RewardsTable = ({ rewards = [], totalPoints = 0 }) => {
               ? `${Math.round(10000 / rawPct)}% 100%`
               : '10000% 100%';
 
+            const isClickable = Boolean(onMonthClick && customerId);
+
             return (
               <tr
                 key={month}
-                className="anim-fade-up"
+                className={`anim-fade-up${isClickable ? ' rw-row--clickable' : ''}`}
                 style={{ '--anim-delay': `${idx * 40}ms` }}
+                onClick={isClickable ? () => onMonthClick(customerId, month) : undefined}
+                role={isClickable ? 'button' : undefined}
+                tabIndex={isClickable ? 0 : undefined}
+                onKeyDown={isClickable
+                  ? (e) => (e.key === 'Enter' || e.key === ' ') && onMonthClick(customerId, month)
+                  : undefined}
+                aria-label={isClickable ? `View ${month} transactions for ${customerId}` : undefined}
               >
-                <td>{month}</td>
+                <td>
+                  <span className="rw-month-label">{month}</span>
+                  {isClickable && <span className="rw-month-chevron" aria-hidden="true">›</span>}
+                </td>
                 <td className="rw-td-pts">
                   <div className="pts-visual">
                     <div

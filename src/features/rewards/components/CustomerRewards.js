@@ -6,10 +6,12 @@ import RewardsTable from './RewardsTable';
  * Container component that drives the rewards dashboard.
  * Delegates all data-fetching and computation to the useRewards hook.
  *
- * @param {{ filterCustomerId?: string|null }} props
- *   When filterCustomerId is provided only that customer's record is shown.
+ * @param {{ filterCustomerId?: string|null, onMonthClick?: (customerId: string, month: string) => void }} props
+ *   filterCustomerId — when set only that customer's record is shown.
+ *   onMonthClick     — called when a month row in any RewardsTable is clicked,
+ *                      enabling drill-through to the filtered Transaction Log.
  */
-const CustomerRewards = ({ filterCustomerId = null }) => {
+const CustomerRewards = ({ filterCustomerId = null, onMonthClick = null }) => {
   const { rewards, loading, error } = useRewards();
 
   if (loading) {
@@ -54,6 +56,8 @@ const CustomerRewards = ({ filterCustomerId = null }) => {
           <RewardsTable
             rewards={customer.monthlyRewards}
             totalPoints={customer.totalPoints}
+            customerId={customer.customerId}
+            onMonthClick={onMonthClick}
           />
         </section>
       ))}

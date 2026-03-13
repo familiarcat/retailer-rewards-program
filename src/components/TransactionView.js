@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getTransactions } from '../features/rewards/services/transactionService';
 import { calculateRewards } from '../features/rewards/utils/rewardCalculator';
+import { getMonthName } from '../features/rewards/utils/dateUtils';
 import useAnimateIn from '../hooks/useAnimateIn';
 
 const COLUMNS = [
@@ -11,7 +12,15 @@ const COLUMNS = [
   { key: 'points',     label: 'Points'    },
 ];
 
-const TransactionView = () => {
+/**
+ * @param {{
+ *   txFilter?: { customerId: string, month: string } | null,
+ *   onClearFilter?: () => void
+ * }} props
+ *   txFilter      — when set, pre-filters rows to that customer + month.
+ *   onClearFilter — called when the user dismisses the active filter.
+ */
+const TransactionView = ({ txFilter = null, onClearFilter = null }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
   const [filter, setFilter]             = useState('');
@@ -37,6 +46,10 @@ const TransactionView = () => {
   const rows = transactions
     .map((tx) => ({ ...tx, points: calculateRewards(tx.amount) }))
     .filter((tx) => {
+      // Month-scoped drill-through filter (from clicking a RewardsTable row)
+      if (txFilter?.customerId && tx.customerId !== txFilter.customerId) return false;
+      if (txFilter?.month && getMonthName(tx.date) !== txFilter.month) return false;
+      // Free-text search filter (toolbar input)
       if (!filter) return true;
       const q = filter.toLowerCase();
       return (
@@ -59,6 +72,25 @@ const TransactionView = () => {
 
   return (
     <div className="tx-view">
+
+      {/* ── Month drill-through context bar ──────────────────────────── */}
+      {txFilter && (
+        <div className="tx-filter-bar anim-slide-left">
+          <span className="tx-filter-bar__label">
+            <span className="tx-filter-bar__icon" aria-hidden="true">◈</span>
+            <strong className="tx-filter-bar__customer">{txFilter.customerId}</strong>
+            <span className="tx-filter-bar__sep" aria-hidden="true">·</span>
+            <span className="tx-filter-bar__month">{txFilter.month}</span>
+          </span>
+          <button
+            className="tx-filter-bar__clear"
+            onClick={onClearFilter}
+            aria-label="Clear filter and show all transactions"
+          >
+            View all transactions ×
+          </button>
+        </div>
+      )}
 
       <div className="tx-toolbar">
         <input
