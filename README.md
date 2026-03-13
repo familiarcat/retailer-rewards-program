@@ -18,7 +18,23 @@ For example, a **$120** purchase earns **90 points**: `(120 - 100) * 2 + (100 - 
 *   **UI Library**: None (plain CSS)
 *   **Package Manager**: npm / yarn
 *   **Build Tools**: React Scripts (`create-react-app`)
+*   **Routing**: Custom History API integration
 *   **Testing**: Jest & React Testing Library
+
+## Project Structure
+
+```text
+src/
+├── components/          # Shared UI views (Dashboard, TransactionLog)
+├── features/
+│   └── rewards/         # Domain logic
+│       ├── components/  # Rewards-specific UI (Tables, Customer Cards)
+│       ├── hooks/       # Data fetching hooks (useRewards)
+│       ├── services/    # Mock API and aggregation logic
+│       └── utils/       # Business logic (rewardCalculator)
+├── styles/
+│   └── global.css       # Design tokens, variables, and animations
+```
 
 ## Getting Started
 
