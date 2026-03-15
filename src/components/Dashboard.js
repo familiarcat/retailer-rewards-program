@@ -156,7 +156,7 @@ const Dashboard = ({ onNavigate }) => {
 
   const totalPoints = rewards.reduce((sum, r) => sum + r.totalPoints, 0);
   const monthCount  = new Set(transactions.map((t) => t.date.slice(0, 7))).size;
-  const recent      = [...transactions].reverse().slice(0, 4);
+  const recent      = [...transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
 
   const kpiValues  = [rewards.length, transactions.length, totalPoints.toLocaleString(), monthCount];
   const kpiLoading = [rewardsLoading, txLoading, rewardsLoading, txLoading];
