@@ -109,7 +109,8 @@ function App() {
       <header className="app-header anim-header">
         <div className="app-header-left">
           <AppLogo
-            size={44}
+            
+            size={92}
             className={`app-logo${view !== 'home' ? ' app-logo--link' : ''}`}
             onClick={view !== 'home' ? () => navigate('home') : undefined}
             role={view !== 'home' ? 'button' : undefined}
@@ -129,6 +130,9 @@ function App() {
               <span className="app-brand__eyebrow">Retailer</span>
               <span className="app-brand__wordmark">Rewards</span>
             </h1>
+            <p className="app-header-tagline">
+              Track spending. Maximize rewards.
+            </p>
           </div>
         </div>
       </header>

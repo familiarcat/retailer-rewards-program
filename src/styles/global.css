@@ -88,7 +88,7 @@
    * WCAG AA normal text requires ≥ 4.5:1; large/bold ≥ 3:1
    */
   --text-primary:   #f1f5ff;   /* lum 0.91 → 10.8:1 on glass  ✓ */
-  --text-secondary: #d4dde8;   /* lum 0.70 →  8.2:1 on glass  ✓ */
+  --text-secondary: #eef2f6;   /* Brightened to avoid visual confusion with bg */
   --text-muted:     #b8c8d8;   /* lum 0.53 →  6.3:1 on glass  ✓ AA normal */
   --text-dim:       #8fa3b5;   /* lum 0.33 →  4.0:1 on glass  ✓ AA large/bold */
 
@@ -117,6 +117,7 @@
    */
   --layout-gutter: 1.75rem;
   --view-indent:   1.25rem;
+  --padding-bottom-main: 3rem;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────── */
@@ -417,7 +418,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   z-index: 1;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 1.75rem var(--layout-gutter) 3rem;
+  padding: var(--layout-gutter) var(--layout-gutter) var(--padding-bottom-main);
 }
 
 /* ── Breadcrumb — floats above the header glass panel ───────────────── */
@@ -503,32 +504,32 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   padding: 1.1rem var(--layout-gutter);
   border-radius: var(--radius-card);
   background: var(--glass-bg);
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0.30) 0%,
+    rgba(255, 255, 255, 0.29) 13%,
+    rgba(255, 255, 255, 0.27) 25%,
+    rgba(255, 255, 255, 0.23) 38%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.13) 62%,
+    rgba(255, 255, 255, 0.08) 75%,
+    rgba(255, 255, 255, 0.04) 87%,
+    transparent 100%
+  );
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  border: none;
   position: relative;
-  overflow: hidden;
-}
-
-/* Horizontal accent line across the header top */
-.app-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg,
-    var(--accent-indigo),
-    var(--accent-violet),
-    var(--accent-pink),
-    var(--accent-teal)
-  );
+  overflow: visible;
 }
 
 /* Logo mark */
 /* AppLogo SVG — transparent background; margin-right separates it from the
    brand wordmark. No background/border needed — the SVG draws its own ring. */
 .app-logo {
-  margin-right: 0.85rem;
+  margin: -1.0rem 1.7rem -1.5rem -3.5rem;
+  position: relative;
+  z-index: 5;
   flex-shrink: 0;
   transition: opacity 0.18s ease, transform 0.18s ease, filter 0.18s ease;
   /* Subtle drop-shadow picks up the page background color so the ring appears
@@ -557,6 +558,12 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   align-items: center;
 }
 
+.app-header-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 /* Two-level brand mark: micro eyebrow + oversized wordmark */
 .app-header-text h1 {
   margin: 0;
@@ -580,12 +587,12 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-family: 'Inter', sans-serif;
   font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--text-muted);
   -webkit-text-fill-color: var(--text-muted);
   line-height: 1;
-  padding-left: 1.45rem;
+  padding-left: 1rem;
 }
 
 /*
@@ -605,6 +612,18 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.app-header-tagline {
+  margin: 0;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--glass-border-dim);
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
 }
 
 .app-title--link { cursor: pointer; }
@@ -1752,7 +1771,10 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 @media (max-width: 640px) {
-  .app-container  { padding: 1rem 1rem 2rem; }
+  :root {
+    --layout-gutter: 1rem;
+    --padding-bottom-main: 2rem;
+  }
   .page-title     { font-size: 1.4rem; }
   .kpi-row        { grid-template-columns: repeat(2, 1fr); }
   .mod-grid       { grid-template-columns: 1fr; }
