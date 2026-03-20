@@ -10,34 +10,34 @@ const MODULES = [
     icon: '⭐',
     title: 'Rewards Catalog',
     tagline: 'Customer points, monthly breakdowns, and loyalty totals',
-    accent: '#a5b4fc',
-    glow: 'rgba(165,180,252,0.11)',
+    accent: 'var(--accent-indigo)',
+    glow: 'color-mix(in srgb, var(--accent-indigo), transparent 89%)',
   },
   {
     id: 'transactions',
     icon: '🗄️',
     title: 'Transaction Log',
     tagline: 'Sortable, filterable raw purchase records',
-    accent: '#5eead4',
-    glow: 'rgba(94,234,212,0.10)',
+    accent: 'var(--accent-teal)',
+    glow: 'color-mix(in srgb, var(--accent-teal), transparent 90%)',
   },
 ];
 
-const PTS_GRADIENT = 'linear-gradient(90deg, #fbbf24 0%, #34d399 100%)';
+const PTS_GRADIENT = 'var(--gradient-pts)';
 
 // ── KPI configuration ─────────────────────────────────────────────────────────
 
 const KPI_DEFS = [
-  { label: 'Customers',            accent: '#a5b4fc', navigateTo: 'rewards',       hint: 'View rewards catalog' },
-  { label: 'Transactions',         accent: '#5eead4', navigateTo: 'transactions',  hint: 'View transaction log' },
-  { label: 'Total Points Awarded', accent: '#34d399', navigateTo: 'rewards',       hint: 'View rewards catalog' },
-  { label: 'Months Tracked',       accent: '#fcd34d', navigateTo: 'monthly',       hint: 'View monthly breakdown' },
+  { label: 'Customers',            accent: 'var(--accent-indigo)', navigateTo: 'rewards',       hint: 'View rewards catalog' },
+  { label: 'Transactions',         accent: 'var(--accent-teal)',   navigateTo: 'transactions',  hint: 'View transaction log' },
+  { label: 'Total Points Awarded', accent: 'var(--accent-emerald)', navigateTo: 'rewards',       hint: 'View rewards catalog' },
+  { label: 'Months Tracked',       accent: 'var(--accent-amber)',  navigateTo: 'monthly',       hint: 'View monthly breakdown' },
 ];
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 // animIndex drives the stagger delay: each card enters 80ms after the previous.
-const KpiCard = ({ label, value, loading, accent, navigateTo, hint, onNavigate, animIndex = 0 }) => (
+const KpiCard = ({ label, value, loading, error, accent, navigateTo, hint, onNavigate, animIndex = 0 }) => (
   <div
     className="kpi-card kpi-card--clickable anim-fade-up"
     style={{
@@ -55,6 +55,8 @@ const KpiCard = ({ label, value, loading, accent, navigateTo, hint, onNavigate, 
       <span className="kpi-value kpi-value--loading">
         <span className="skeleton" style={{ display: 'inline-block', width: '3rem', height: '2.2rem', borderRadius: 6 }} />
       </span>
+    ) : error ? (
+      <span className="kpi-value kpi-value--error" title="Failed to load data">!</span>
     ) : (
       <span className="kpi-value">{value}</span>
     )}
@@ -63,7 +65,7 @@ const KpiCard = ({ label, value, loading, accent, navigateTo, hint, onNavigate, 
   </div>
 );
 
-const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
+const CustomerPointsChart = ({ rewards, loading, error, onNavigate }) => {
   if (loading) {
     return (
       <div className="points-chart">
@@ -74,6 +76,14 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
             <div className="pchart-val skeleton" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="chart-error">
+        Unable to load customer points data.
       </div>
     );
   }
@@ -107,7 +117,7 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
                 style={{ width: `${pct}%`, background: PTS_GRADIENT }}
               />
             </div>
-            <span className="pchart-val" style={{ color: '#34d399' }}>{r.totalPoints.toLocaleString()}</span>
+            <span className="pchart-val" style={{ color: 'var(--accent-emerald)' }}>{r.totalPoints.toLocaleString()}</span>
           </div>
         );
       })}
@@ -158,13 +168,18 @@ const ModuleTile = ({ mod, onNavigate, animIndex = 0 }) => (
 // ── Dashboard ──────────────────────────────────────────────────────────────────
 
 const Dashboard = ({ onNavigate }) => {
-  const { rewards, loading: rewardsLoading } = useRewards();
+  const { rewards, loading: rewardsLoading, error: rewardsError } = useRewards();
   const [transactions, setTransactions]       = useState([]);
   const [txLoading, setTxLoading]             = useState(true);
+  const [txError, setTxError]                 = useState(null);
 
   useEffect(() => {
     getTransactions()
       .then(setTransactions)
+      .catch((err) => {
+        console.error('Failed to load transactions', err);
+        setTxError('Failed to load transaction data.');
+      })
       .finally(() => setTxLoading(false));
   }, []);
 
@@ -174,6 +189,7 @@ const Dashboard = ({ onNavigate }) => {
 
   const kpiValues  = [rewards.length, transactions.length, totalPoints.toLocaleString(), monthCount];
   const kpiLoading = [rewardsLoading, txLoading, rewardsLoading, txLoading];
+  const kpiErrors  = [rewardsError, txError, rewardsError, txError];
 
   return (
     <div className="dashboard">
@@ -186,6 +202,7 @@ const Dashboard = ({ onNavigate }) => {
             label={def.label}
             value={kpiValues[i]}
             loading={kpiLoading[i]}
+            error={kpiErrors[i]}
             accent={def.accent}
             navigateTo={def.navigateTo}
             hint={def.hint}
@@ -219,6 +236,7 @@ const Dashboard = ({ onNavigate }) => {
             <CustomerPointsChart
               rewards={rewards}
               loading={rewardsLoading}
+              error={rewardsError}
               onNavigate={onNavigate}
             />
           </div>
@@ -233,6 +251,8 @@ const Dashboard = ({ onNavigate }) => {
         </h2>
         {txLoading ? (
           <p className="loading">Loading…</p>
+        ) : txError ? (
+          <div className="error" style={{ textAlign: 'center' }}>{txError}</div>
         ) : (
           <div className="recent-table-outer anim-glass-reveal" style={{ '--anim-delay': '240ms' }}>
             <div className="recent-table-wrap">

@@ -1,33 +1,48 @@
 #!/bin/bash
 
-# Define the favicon file name
-FAVICON="favicon.ico"
-
-# Step 1: Check favicon file location
-if [ ! -f "public/$FAVICON" ]; then
-    echo "Favicon not found in the public directory. Please ensure $FAVICON is present."
-    exit 1
-fi
-
-# Step 2: Update index.html with favicon link
+# Define source logo and desired favicon name
+SOURCE_LOGO="src/assets/appLogo.svg"
+FAVICON_SVG="favicon.svg"
+PUBLIC_FAVICON_PATH="public/$FAVICON_SVG"
 HTML_FILE="public/index.html"
 
-echo "Updating index.html with favicon link..."
-if grep -q "<link rel=\"icon\"" "$HTML_FILE"; then
-    echo "Favicon link already exists in $HTML_FILE."
+# Step 1: Ensure a favicon exists in the public directory.
+# If not, create one from the source appLogo.svg.
+if [ ! -f "$PUBLIC_FAVICON_PATH" ]; then
+    echo "Favicon '$FAVICON_SVG' not found in public directory."
+    if [ -f "$SOURCE_LOGO" ]; then
+        echo "Creating favicon from '$SOURCE_LOGO'..."
+        cp "$SOURCE_LOGO" "$PUBLIC_FAVICON_PATH"
+        echo "Favicon created at '$PUBLIC_FAVICON_PATH'."
+    else
+        echo "Error: Source logo '$SOURCE_LOGO' not found. Cannot create favicon."
+        exit 1
+    fi
+fi
+
+# Step 2: Update index.html to use the SVG favicon.
+echo "Updating index.html to use SVG favicon..."
+# If a favicon link exists, replace its href. If not, add a new link.
+if grep -q '<link rel="icon"' "$HTML_FILE"; then
+    sed -i.bak 's|<link rel="icon" href="[^"]*"|<link rel="icon" href="%PUBLIC_URL%/'"$FAVICON_SVG"'"|' "$HTML_FILE"
+    echo "Favicon link in $HTML_FILE updated to use $FAVICON_SVG."
 else
-    echo "<link rel=\"icon\" href=\"%PUBLIC_URL%/$FAVICON\" />" >> "$HTML_FILE"
+    sed -i.bak 's#</head>#  <link rel="icon" href="%PUBLIC_URL%/'"$FAVICON_SVG"'" />\n</head>#' "$HTML_FILE"
     echo "Favicon link added to $HTML_FILE."
+fi
+rm -f "$HTML_FILE.bak"
+
+# Step 2.5: Ensure browser opens on start
+ENV_FILE=".env"
+if [ ! -f "$ENV_FILE" ] || ! grep -q -s "BROWSER=" "$ENV_FILE"; then
+    echo "" >> "$ENV_FILE"
+    echo "# Automatically open browser on 'npm start'" >> "$ENV_FILE"
+    echo "BROWSER='Google Chrome'" >> "$ENV_FILE"
+    echo "Configured project to open browser on start (via .env file)."
 fi
 
 # Step 3: Clear Browser Cache
 echo "Remember to clear your browser cache to see the updated favicon."
 
-# Step 4: Suggest checking Favicon Format
-echo "Ensure your favicon is in the .ico format. If not, consider using a favicon generator."
+echo "Setup complete. You can now run 'npm start' to see the changes."
 
-# Step 5: Restart Local Server with notification
-echo "Restarting the development server..."
-npm start
-
-echo "All steps completed. Please verify the favicon in your browser."

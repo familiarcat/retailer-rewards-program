@@ -7,6 +7,7 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
   const [expandedMonths, setExpandedMonths] = useState(new Set());
   const [details, setDetails] = useState({}); // Cache for fetched transactions
   const [loadingMap, setLoadingMap] = useState({});
+  const [errorMap, setErrorMap] = useState({});
 
   const handleToggle = async (month) => {
     const isExpanding = !expandedMonths.has(month);
@@ -21,6 +22,7 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
     // If expanding and we don't have data yet, fetch it
     if (isExpanding && !details[month]) {
       setLoadingMap((prev) => ({ ...prev, [month]: true }));
+      setErrorMap((prev) => ({ ...prev, [month]: null }));
       try {
         const allTx = await getTransactions();
         const filtered = allTx.filter(
@@ -28,7 +30,8 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
         );
         setDetails((prev) => ({ ...prev, [month]: filtered }));
       } catch (err) {
-        console.error('Failed to load transaction details', err);
+        console.error('Failed to load transaction details for accordion', err);
+        setErrorMap((prev) => ({ ...prev, [month]: 'Failed to load transaction details.' }));
       } finally {
         setLoadingMap((prev) => ({ ...prev, [month]: false }));
       }
@@ -54,6 +57,7 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
           {rewards.map(({ month, points }, rowIdx) => {
             const isExpanded = expandedMonths.has(month);
             const isLoading = loadingMap[month];
+            const monthError = errorMap[month];
             const monthTx = details[month] || [];
             // Rows stagger from sectionDelay + 50 ms (after the panel glass-reveal)
             // at 30 ms per row. The heading and panel reveal happen first,
@@ -87,6 +91,8 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
                       <div className="accordion-wrap anim-fade-in">
                         {isLoading ? (
                           <div className="accordion-loading">Loading transactions...</div>
+                        ) : monthError ? (
+                          <div className="accordion-error">{monthError}</div>
                         ) : monthTx.length === 0 ? (
                           <div className="accordion-empty">No transactions recorded.</div>
                         ) : (
