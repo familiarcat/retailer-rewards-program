@@ -16,6 +16,15 @@
             <stop offset="100%" stop-color="#d97706" />
         </linearGradient>
         <linearGradient
+            id="al-gold-rev"
+            x1="44" y1="44" x2="4" y2="4"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#fff8e8" />
+            <stop offset="25%"  stop-color="#fcd34d" />
+            <stop offset="62%"  stop-color="#f59e0b" />
+            <stop offset="100%" stop-color="#d97706" />
+        </linearGradient>
+        <linearGradient
             id="al-gold-dim"
             x1="4" y1="4" x2="44" y2="44"
             gradientUnits="userSpaceOnUse">
@@ -51,7 +60,7 @@
         font-family="'Arial', Helvetica, sans-serif"
         font-size="31.8" 
         font-weight="780"
-        fill="url(#al-gold)"
+        fill="url(#al-gold-rev)"
         opacity="0.88"
         dominant-baseline="auto">
         $

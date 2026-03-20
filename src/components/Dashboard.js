@@ -81,10 +81,13 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
   if (!rewards.length) return null;
 
   const max = Math.max(...rewards.map((r) => r.totalPoints), 1);
+  const MAX_ITEMS = 5;
+  const visibleRewards = rewards.slice(0, MAX_ITEMS);
+  const hasMore = rewards.length > MAX_ITEMS;
 
   return (
-    <div className="points-chart">
-      {rewards.map((r, i) => {
+    <div className="points-chart" style={{ height: '100%' }}>
+      {visibleRewards.map((r, i) => {
         const pct = Math.round((r.totalPoints / max) * 100);
         return (
           <div
@@ -108,6 +111,17 @@ const CustomerPointsChart = ({ rewards, loading, onNavigate }) => {
           </div>
         );
       })}
+      {hasMore && (
+        <div style={{ marginTop: 'auto', paddingTop: '0.85rem', borderTop: '1px solid var(--glass-border-dim)', display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            className="recent-view-all"
+            style={{ margin: 0 }}
+            onClick={() => onNavigate('rewards')}
+          >
+            View all customers →
+          </button>
+        </div>
+      )}
     </div>
   );
 };
