@@ -92,7 +92,7 @@
   --text-primary:   #ffffff;
   --text-secondary: #f1f5f9;
   --text-muted:     #cbd5e1;
-  --text-dim:       #94a3b8;
+  --text-dim:       #c4cfde;   /* Brightened to ~4.6:1 against glass bg for WCAG AA */
 
   /* Spacing */
   --radius-card: 14px;
@@ -1096,7 +1096,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .recent-cell--product  { font-weight: 600; color: var(--text-primary) !important; }
 .recent-cell--customer { color: var(--accent-customer) !important; font-weight: 500; }
 .recent-cell--amount   { font-weight: 700; color: var(--text-primary) !important; font-variant-numeric: tabular-nums; }
-.recent-cell--date     { color: var(--text-dim) !important; font-size: 0.78rem; }
+.recent-cell--date     { color: var(--text-muted) !important; font-size: 0.82rem; font-weight: 500; }
 
 /* ── Clickable row ───────────────────────────────────────────────────── */
 .recent-row--clickable {
@@ -1415,7 +1415,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   transform: rotate(0deg) scale(1.25) translateX(4px);
 }
 /* Expanded: chevron pivots down to show the accordion is open */
-.rw-row--expanded .rw-month-chevron {
+.rw-row--clickable.rw-row--expanded .rw-month-chevron {
   opacity: 1;
   transform: rotate(90deg) scale(1.1) translateX(0px);
 }
@@ -1700,7 +1700,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .tx-cell--product  { font-weight: 600; }
 .tx-cell--customer { color: var(--accent-customer); font-weight: 500; }
 .tx-cell--date     { color: var(--text-secondary); }
-.tx-cell--pts      { white-space: nowrap; }
+.tx-cell--pts      { white-space: nowrap; font-weight: 600; }
 
 /*
  * Column differentiation — each of the 5 columns has its own identity tint.
@@ -1715,6 +1715,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .tx-table th:nth-child(1),
 .tx-table td:nth-child(1) {
   background-color: rgba(196, 181, 253, 0.05);
+  color: var(--accent-customer);
   border-right: 1px solid rgba(196, 181, 253, 0.12);
 }
 
@@ -1739,6 +1740,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .tx-table th:nth-child(5),
 .tx-table td:nth-child(5) {
   background-color: rgba(148, 163, 184, 0.04);
+  color: var(--text-muted); /* Better visibility/hierarchy than generic secondary */
 }
 
 /* Amount cell with micro-bar */
@@ -1933,7 +1935,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--glass-border-dim);
-  background: var(--glass-bg-deep);
+  background: var(--glass-bg); /* Upgrade to full glass for consistency */
 }
 
 .modal-title {
@@ -1967,7 +1969,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 .modal-item {
   padding: 0.85rem 1.5rem;
-  border-bottom: 1px solid var(--glass-border-dim);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2053,8 +2055,10 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   gap: 0.28rem;
   padding: 0.18rem 0.6rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--glass-bg-deep); /* Expands glassmorphism to these pills */
+  border: 1px solid var(--glass-border-dim);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
   white-space: nowrap;
 }
 
@@ -2120,7 +2124,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .mv-cell--product {
   color: var(--text-primary);
 }
-.mv-cell--date {
+.mv-cell--date { /* Matching the visibility fix from Dashboard/TxView */
   color: var(--text-muted);
   font-size: 0.8rem;
   white-space: nowrap;

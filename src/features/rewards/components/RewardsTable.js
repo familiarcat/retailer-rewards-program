@@ -67,7 +67,7 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
             return (
               <React.Fragment key={month}>
                 <tr
-                  className={`rw-row--clickable anim-fade-up ${isExpanded ? 'rw-row--expanded' : ''}`}
+                  className={`rw-row--clickable anim-fade-up${isExpanded ? ' rw-row--expanded' : ''}`}
                   style={{ '--anim-delay': rowDelay }}
                   onClick={() => handleToggle(month)}
                   tabIndex={0}
