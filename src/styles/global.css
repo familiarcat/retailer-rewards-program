@@ -18,7 +18,7 @@
 @property --aurora-hue {
   syntax: '<angle>';
   inherits: true;
-  initial-value: 240deg;
+  initial-value: 45deg;
 }
 @property --aurora-alpha {
   syntax: '<number>';
@@ -36,7 +36,7 @@
    * These are the initial values; @keyframes auroraShift overrides them.
    * The animation is placed on :root so inherited custom properties
    * reach every child in a single cascade.                              */
-  --aurora-hue:        240deg;
+  --aurora-hue:        45deg;
   --aurora-alpha:      0.18;
   --aurora-alpha-dim:  0.07;
 
@@ -137,12 +137,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   /* Dark base — atmospheric colour orbs */
-  background-color: #070b16;
+  background-color: #0c0a09;
   background-image:
-    radial-gradient(ellipse 80% 60% at 10% 15%,  rgba(99,  102, 241, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 70% at 90% 80%,  rgba(168,  85, 247, 0.16) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 45% at 65%  5%,  rgba(20,  184, 166, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 55% at 30% 92%,  rgba(236,  72, 153, 0.10) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 60% at 10% 15%,  rgba(251, 191, 36, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 70% at 90% 80%,  rgba(245, 158, 11, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 65%  5%,  rgba(254, 243, 199, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 55% at 30% 92%,  rgba(217, 119,  6, 0.08) 0%, transparent 60%);
 }
 
 /* Subtle dot-grid texture — low-z so content sits above */
@@ -182,11 +182,11 @@ body::after {
   z-index: 0;
   will-change: transform, filter;
   background-image:
-    radial-gradient(ellipse 55% 45% at 22% 28%,  rgba(99,  102, 241, 0.18) 0%, transparent 52%),
-    radial-gradient(ellipse 45% 55% at 78% 68%,  rgba(168,  85, 247, 0.14) 0%, transparent 52%),
-    radial-gradient(ellipse 40% 38% at 62% 12%,  rgba(20,  184, 166, 0.11) 0%, transparent 52%),
-    radial-gradient(ellipse 35% 48% at 18% 82%,  rgba(251, 191,  36, 0.09) 0%, transparent 52%),
-    radial-gradient(ellipse 50% 42% at 50% 50%,  rgba(236,  72, 153, 0.07) 0%, transparent 50%);
+    radial-gradient(ellipse 55% 45% at 22% 28%,  rgba(251, 191, 36, 0.12) 0%, transparent 52%),
+    radial-gradient(ellipse 45% 55% at 78% 68%,  rgba(245, 158, 11, 0.10) 0%, transparent 52%),
+    radial-gradient(ellipse 40% 38% at 62% 12%,  rgba(254, 215, 170, 0.08) 0%, transparent 52%),
+    radial-gradient(ellipse 35% 48% at 18% 82%,  rgba(251, 146,  60, 0.08) 0%, transparent 52%),
+    radial-gradient(ellipse 50% 42% at 50% 50%,  rgba(253, 186, 116, 0.06) 0%, transparent 50%);
   animation: orbDrift 26s ease-in-out infinite alternate;
 }
 
@@ -252,15 +252,15 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
  * passes behind them — luminosity-reactive without any JavaScript.
  */
 @keyframes auroraShift {
-  0%   { --aurora-hue: 240deg; --aurora-alpha: 0.18; --aurora-alpha-dim: 0.07; }
-  15%  { --aurora-hue: 252deg; --aurora-alpha: 0.24; --aurora-alpha-dim: 0.09; }
-  25%  { --aurora-hue: 268deg; --aurora-alpha: 0.30; --aurora-alpha-dim: 0.13; }
-  40%  { --aurora-hue: 220deg; --aurora-alpha: 0.21; --aurora-alpha-dim: 0.08; }
-  50%  { --aurora-hue: 178deg; --aurora-alpha: 0.26; --aurora-alpha-dim: 0.11; }
-  65%  { --aurora-hue: 195deg; --aurora-alpha: 0.19; --aurora-alpha-dim: 0.07; }
-  75%  { --aurora-hue: 320deg; --aurora-alpha: 0.28; --aurora-alpha-dim: 0.12; }
-  88%  { --aurora-hue: 285deg; --aurora-alpha: 0.23; --aurora-alpha-dim: 0.09; }
-  100% { --aurora-hue: 255deg; --aurora-alpha: 0.20; --aurora-alpha-dim: 0.08; }
+  0%   { --aurora-hue: 45deg;  --aurora-alpha: 0.18; --aurora-alpha-dim: 0.07; }
+  15%  { --aurora-hue: 35deg;  --aurora-alpha: 0.24; --aurora-alpha-dim: 0.09; }
+  25%  { --aurora-hue: 25deg;  --aurora-alpha: 0.30; --aurora-alpha-dim: 0.13; }
+  40%  { --aurora-hue: 40deg;  --aurora-alpha: 0.21; --aurora-alpha-dim: 0.08; }
+  50%  { --aurora-hue: 55deg;  --aurora-alpha: 0.26; --aurora-alpha-dim: 0.11; }
+  65%  { --aurora-hue: 48deg;  --aurora-alpha: 0.19; --aurora-alpha-dim: 0.07; }
+  75%  { --aurora-hue: 30deg;  --aurora-alpha: 0.28; --aurora-alpha-dim: 0.12; }
+  88%  { --aurora-hue: 38deg;  --aurora-alpha: 0.23; --aurora-alpha-dim: 0.09; }
+  100% { --aurora-hue: 42deg;  --aurora-alpha: 0.20; --aurora-alpha-dim: 0.08; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -843,41 +843,6 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   filter: drop-shadow(0 0 6px var(--tile-accent, rgba(165,180,252,0.5)));
 }
 
-/* Animated live badge */
-.mod-tile__badge {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  padding: 0.2rem 0.65rem;
-  border-radius: 10px;
-  background: var(--glass-bg-deep);
-  border: 1px solid var(--glass-border-dim);
-  color: var(--text-muted);
-}
-.mod-tile__badge--live {
-  background: rgba(110, 231, 183, 0.12);
-  border-color: rgba(110, 231, 183, 0.3);
-  color: var(--accent-green);
-}
-.mod-tile__badge--live::before {
-  content: '';
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent-green);
-  animation: pulse-dot 2.2s ease-in-out infinite;
-  flex-shrink: 0;
-}
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1;   transform: scale(1); }
-  50%       { opacity: 0.4; transform: scale(0.7); }
-}
-
 .mod-tile__title {
   font-size: 1rem;
   font-weight: 700;
@@ -892,27 +857,6 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   margin: 0;
   line-height: 1.55;
 }
-
-.mod-tile__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--glass-border-dim);
-}
-
-.mod-tile__cta {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--tile-accent, var(--accent-indigo));
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  letter-spacing: 0.02em;
-  transition: gap 0.15s;
-}
-.mod-tile:hover .mod-tile__cta { gap: 0.55rem; }
 
 /* ── Customer Points Chart ────────────────────────────────────────────── */
 .points-chart { display: flex; flex-direction: column; gap: 0.9rem; flex: 1; }
@@ -1021,13 +965,14 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  overflow: hidden;
-  padding-bottom: 0.85rem;
+  overflow: visible; /* Match other panel containers */
+  padding: 0.85rem 0.9rem;
 }
 
 /* Scroll wrapper keeps the table constrained on narrow viewports */
 .recent-table-wrap {
   overflow-x: auto;
+  margin: 0 -0.9rem; /* Negative margin for edge-to-edge table */
 }
 
 .recent-table {
@@ -1038,9 +983,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /* ── Table header ────────────────────────────────────────────────────── */
 .recent-table th {
-  text-align: left;
-  padding: 0.65rem 0.9rem;
-  background: var(--glass-bg-deep);
+  padding: 0.7rem 0.9rem;
+  /* background: var(--glass-bg-deep); -- Overridden by column tints */
   border-bottom: 1px solid var(--glass-border);
   font-weight: 700;
   font-size: 0.7rem;
@@ -1051,44 +995,57 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /* ── Table cells ─────────────────────────────────────────────────────── */
 .recent-table td {
-  padding: 0.55rem 0.9rem;
+  padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--glass-border-dim);
   vertical-align: middle;
   color: var(--text-secondary);
   font-size: 0.82rem;
 }
+.recent-table th:nth-child(n+4),
+.recent-table td:nth-child(n+4) {
+  text-align: right;
+}
+
 .recent-table tbody tr:last-child td { border-bottom: none; }
 
-/* ── Alternating row stripes — matches tx-table rhythm ──────────────── */
-.recent-table tbody tr:nth-child(odd)  { background: rgba(251, 191, 36, 0.06); }
-.recent-table tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
-
 /* ── Per-column background tints ─────────────────────────────────────
- * Col 1  Product  — indigo  (entity identity, cool anchor)
- * Col 2  Customer — violet  (owner association)
- * Col 3  Amount   — teal    (transactional value)
- * Col 4  Date     — slate   (temporal, neutral)
- * Opacities kept low so tints layer cleanly over the row stripes.      */
-.recent-table th:nth-child(1),
+ * Col 1  Customer — indigo  (primary key / identity)
+ * Col 2  Product  — violet  (item detail)
+ * Col 3  Amount   — amber   (transactional value)
+ * Col 4  Points   — teal    (value/currency)
+ * Col 5  Date     — slate   (temporal, neutral)
+ */
+.recent-table th:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.18);
+  border-right: 1px solid rgba(165, 180, 252, 0.25);
+  color: var(--accent-customer);
+  padding-left: var(--view-indent);
+}
 .recent-table td:nth-child(1) {
   background-color: rgba(165, 180, 252, 0.07);
   border-right: 1px solid rgba(165, 180, 252, 0.12);
-  color: #ffffff;
+  color: var(--accent-customer);
+  padding-left: calc(var(--view-indent) + 0.75rem); /* Staggered indentation */
 }
-.recent-table th:nth-child(1) { color: #c8b8a2; }
 
-.recent-table th:nth-child(2),
+.recent-table th:nth-child(2) { background-color: rgba(196, 181, 253, 0.15); color: var(--text-secondary); }
 .recent-table td:nth-child(2) {
   background-color: rgba(196, 181, 253, 0.05);
+  color: #ffffff;
 }
 
-.recent-table th:nth-child(3),
+.recent-table th:nth-child(3) { background-color: rgba(251, 191, 36, 0.18); }
 .recent-table td:nth-child(3) {
+  background-color: rgba(251, 191, 36, 0.07);
+}
+
+.recent-table th:nth-child(4) { background-color: rgba(94, 234, 212, 0.18); color: var(--accent-emerald); }
+.recent-table td:nth-child(4) {
   background-color: rgba(94, 234, 212, 0.05);
 }
 
-.recent-table th:nth-child(4),
-.recent-table td:nth-child(4) {
+.recent-table th:nth-child(5) { background-color: rgba(148, 163, 184, 0.15); }
+.recent-table td:nth-child(5) {
   background-color: rgba(148, 163, 184, 0.04);
 }
 
@@ -1096,6 +1053,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .recent-cell--product  { font-weight: 600; color: var(--text-primary) !important; }
 .recent-cell--customer { color: var(--accent-customer) !important; font-weight: 500; }
 .recent-cell--amount   { font-weight: 700; color: var(--text-primary) !important; font-variant-numeric: tabular-nums; }
+.recent-cell--pts      { } /* Styling handled by .pts-badge */
 .recent-cell--date     { color: var(--text-muted) !important; font-size: 0.82rem; font-weight: 500; }
 
 /* ── Clickable row ───────────────────────────────────────────────────── */
@@ -1103,8 +1061,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   cursor: pointer;
   transition: background 0.14s ease;
 }
-.recent-row--clickable:hover td {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+.recent-row--clickable:hover {
+  background: rgba(251, 191, 36, 0.12) !important; /* Amber hover for clickable rows */
 }
 .recent-row--clickable:focus-visible {
   outline: none;
@@ -1116,7 +1074,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 /* ── "View all" footer link ──────────────────────────────────────────── */
 .recent-view-all {
   align-self: flex-start;
-  margin: 0 0.9rem;
+  margin: 0; /* Handled by container padding */
   background: none;
   border: none;
   color: var(--accent-indigo);
@@ -1199,7 +1157,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  padding: 1.5rem 1.6rem;
+  padding: 1.5rem 0; /* Horizontal padding removed for edge-to-edge table */
   position: relative;
   overflow: hidden;
   overflow: visible;
@@ -1255,16 +1213,16 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .rewards-table th,
 .rewards-table td {
   text-align: left;
-  padding: 0.55rem 0.75rem;
   border-bottom: 1px solid var(--glass-border-dim);
 }
+.rewards-table td { padding: 0.6rem 0.9rem; } /* Standardize cell padding */
+.rewards-table th { padding: 0.7rem 0.9rem; } /* Standardize cell padding */
 
 .rewards-table th {
-  background: var(--glass-bg-deep);
+  /* background: var(--glass-bg-deep); -- Overridden by column tints */
   font-weight: 800;
   font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--text-primary);
   position: sticky;
   top: 0;
@@ -1275,49 +1233,36 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /*
  * Column differentiation — Month column gets a cool indigo tint,
- * Points Earned column gets a warm amber tint. The contrast between
+ * Points Earned column gets a cool teal tint. The contrast between
  * cool-left / warm-right gives each column a distinct visual lane,
  * making it easy to scan horizontally without heavy dividers.
- * Tints are intentionally light so they layer cleanly over the row stripes.
  */
-.rewards-table th:first-child,
+.rewards-table th:first-child {
+  background-color: rgba(165, 180, 252, 0.18);
+  border-right: 1px solid rgba(165, 180, 252, 0.25);
+  color: var(--text-primary);
+  padding-left: var(--view-indent);
+}
 .rewards-table td:first-child {
   background-color: rgba(165, 180, 252, 0.07);
-  padding-left: var(--view-indent);
+  padding-left: calc(var(--view-indent) + 0.75rem); /* Staggered indentation */
   border-right: 1px solid rgba(165, 180, 252, 0.14);
   /* Month names in full white for maximum legibility against the indigo tint */
   color: #ffffff;
 }
-.rewards-table th:first-child {
-  color: var(--text-primary);
-}
-.rewards-table td:first-child {
-  padding-left: calc(var(--view-indent) + 1rem);
-}
 
+.rewards-table th:last-child { background-color: rgba(94, 234, 212, 0.18); color: var(--accent-emerald); }
+.rewards-table td:last-child {
+  background-color: rgba(94, 234, 212, 0.05);
+}
 .rewards-table th:last-child,
 .rewards-table td:last-child {
-  background-color: rgba(251, 191, 36, 0.07);
-}
-.rewards-table th:last-child {
-  color: var(--text-primary);
+  text-align: right;
 }
 
 .rewards-table td {
-  font-size: 0.875rem;
+  font-size: 0.855rem; /* Match other tables */
   color: var(--text-secondary);
-}
-
-/*
- * Alternating row tints — warm amber on odd rows, cool glass on even rows.
- * The warm/cool alternation gives each row a distinct identity without
- * high-contrast borders, letting the user track horizontally across columns.
- */
-.rewards-table tbody tr:nth-child(odd) {
-  background: rgba(251, 191, 36, 0.06);
-}
-.rewards-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.025);
 }
 
 .rewards-table tr:last-child td { border-bottom: none; }
@@ -1654,9 +1599,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .tx-table { width: 100%; border-collapse: collapse; font-size: 0.855rem; }
 
 .tx-th {
-  text-align: left;
   padding: 0.7rem 0.9rem;
-  background: var(--glass-bg-deep);
+  /* background: var(--glass-bg-deep); -- Overridden by column tints */
   border-bottom: 1px solid var(--glass-border);
   font-weight: 700;
   font-size: 0.7rem;
@@ -1669,6 +1613,10 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   transition: background 0.12s, color 0.12s;
   position: relative;
 }
+.tx-table th:nth-child(n+4),
+.tx-table td:nth-child(n+4) {
+  text-align: right;
+}
 .tx-th:hover        { background: rgba(255,255,255,0.14); color: var(--text-secondary); }
 .tx-th--sorted      { color: var(--accent-indigo); }
 .tx-th--nodrop      { cursor: default; }
@@ -1680,16 +1628,13 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background: var(--accent-indigo);
   opacity: 0.6;
 }
-
-/*
- * Row striping — matches rewards table: odd rows warm amber, even rows cool glass.
- * Middle columns (Customer, Amount, Date) reveal the stripe; the anchored
- * Product and Points columns stay on their own constant column tints.
- */
-.tx-row { transition: background 0.1s; }
-.tx-row:nth-child(odd)  { background: rgba(251, 191, 36, 0.06); }
-.tx-row:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
-.tx-row:hover           { background: rgba(251, 191, 36, 0.12) !important; }
+.tx-row {
+  transition: background 0.1s;
+  /* Row striping removed for consistent column-based color scheme */
+}
+.tx-row:hover {
+  background: rgba(255, 255, 255, 0.055) !important; /* Neutral hover for non-clickable rows */
+}
 
 .tx-cell {
   padding: 0.6rem 0.9rem;
@@ -1704,40 +1649,42 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 
 /*
  * Column differentiation — each of the 5 columns has its own identity tint.
- * Tints are layered on top of the tr row-stripe background:
- *   Col 1  Customer — violet   (person/identity)
- *   Col 2  Product  — indigo   (navigation/identifier lane)
- *   Col 3  Amount   — teal     (transactional data)
- *   Col 4  Points   — amber    (value/currency — leads to green bar terminus)
+ *   Col 1  Customer — indigo   (primary key / identity)
+ *   Col 2  Product  — violet   (item detail)
+ *   Col 3  Amount   — amber    (transactional data)
+ *   Col 4  Points   — teal     (value/currency — leads to green bar terminus)
  *   Col 5  Date     — slate    (temporal, neutral)
- * Opacity is kept very low so tints provide lane cues without drowning the stripes.
  */
-.tx-table th:nth-child(1),
-.tx-table td:nth-child(1) {
-  background-color: rgba(196, 181, 253, 0.05);
+.tx-table th:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.18);
+  border-right: 1px solid rgba(165, 180, 252, 0.25);
   color: var(--accent-customer);
-  border-right: 1px solid rgba(196, 181, 253, 0.12);
+  padding-left: var(--view-indent);
+}
+.tx-table td:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.07);
+  color: var(--accent-customer);
+  border-right: 1px solid rgba(165, 180, 252, 0.12);
+  padding-left: calc(var(--view-indent) + 0.75rem); /* Staggered indentation */
 }
 
-.tx-table th:nth-child(2),
+.tx-table th:nth-child(2) { background-color: rgba(196, 181, 253, 0.15); color: var(--text-secondary); }
 .tx-table td:nth-child(2) {
-  background-color: rgba(165, 180, 252, 0.07);
+  background-color: rgba(196, 181, 253, 0.05);
   color: #ffffff;
 }
-.tx-table th:nth-child(2) { color: #c8b8a2; }
 
-.tx-table th:nth-child(3),
+.tx-table th:nth-child(3) { background-color: rgba(251, 191, 36, 0.18); }
 .tx-table td:nth-child(3) {
+  background-color: rgba(251, 191, 36, 0.07);
+}
+
+.tx-table th:nth-child(4) { background-color: rgba(94, 234, 212, 0.18); color: var(--accent-emerald); }
+.tx-table td:nth-child(4) {
   background-color: rgba(94, 234, 212, 0.05);
 }
 
-.tx-table th:nth-child(4),
-.tx-table td:nth-child(4) {
-  background-color: rgba(251, 191, 36, 0.07);
-}
-.tx-table th:nth-child(4) { color: #c8b8a2; }
-
-.tx-table th:nth-child(5),
+.tx-table th:nth-child(5) { background-color: rgba(148, 163, 184, 0.15); }
 .tx-table td:nth-child(5) {
   background-color: rgba(148, 163, 184, 0.04);
   color: var(--text-muted); /* Better visibility/hierarchy than generic secondary */
@@ -1770,6 +1717,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   color: var(--text-primary);
   font-size: 0.875rem;
 }
+
+.amt-cell { align-items: flex-start; }
 
 /*
  * Points badge (transaction table).
@@ -1814,8 +1763,8 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   .kpi-row        { grid-template-columns: repeat(2, 1fr); }
   .mod-grid       { grid-template-columns: 1fr; }
   /* Hide the Date column on narrow viewports — least critical data point */
-  .recent-table th:nth-child(4),
-  .recent-table td:nth-child(4) { display: none; }
+  .recent-table th:nth-child(5),
+  .recent-table td:nth-child(5) { display: none; }
   .tx-toolbar     { flex-direction: column; align-items: stretch; }
   .pchart-row     { grid-template-columns: 6rem 1fr 3rem; }
 }
@@ -1863,28 +1812,67 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 .accordion-item {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.2fr;
-  padding: 0.6rem 1.5rem 0.6rem 2.5rem; /* Increased left padding to nest visually */
+  padding: 0;
   border-bottom: 1px solid rgba(255,255,255,0.04);
   font-size: 0.8rem;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: stretch;
+  gap: 0;
 }
 .accordion-item:last-child { border-bottom: none; }
-
-.acc-prod { color: var(--text-primary); font-weight: 500; }
-.acc-amt  { color: var(--text-primary); font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
-.acc-pts  { color: var(--accent-emerald); text-align: right; font-weight: 700; font-size: 0.75rem; }
-.acc-date { color: var(--text-muted); font-size: 0.75rem; text-align: right; }
 
 /* Header for the accordion list */
 .accordion-header {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1.2fr;
-  gap: 0.5rem;
-  padding: 0.4rem 1.5rem 0.4rem 2.5rem;
+  gap: 0;
+  padding: 0;
   border-bottom: 1px solid var(--glass-border-dim);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
+  align-items: stretch;
 }
+
+/* Cell Styling & Column Tints (matching .tx-table) */
+.accordion-header > span,
+.accordion-item > span {
+  padding: 0.6rem 0.9rem; /* Standardize horizontal padding */
+  display: flex;
+  align-items: center;
+}
+
+/* Header: boosted opacity for better legibility & contrast */
+.accordion-header > span:first-child {
+  padding-left: calc(var(--view-indent) * 2); /* 2.5rem, nests under month */
+  background-color: rgba(165, 180, 252, 0.18);
+  border-right: 1px solid rgba(165, 180, 252, 0.25);
+  color: var(--text-secondary);
+}
+
+.accordion-item > span:first-child {
+  /* Nests under header label, +0.75rem */
+  padding-left: calc(var(--view-indent) * 2 + 0.75rem);
+  background-color: rgba(165, 180, 252, 0.07);
+  border-right: 1px solid rgba(165, 180, 252, 0.12);
+  color: var(--text-primary);
+}
+
+.accordion-header > span:nth-child(n+3),
+.accordion-item > span:nth-child(n+3) {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.accordion-item > span:nth-child(2) { background-color: rgba(251, 191, 36, 0.07); }
+.accordion-item > span:nth-child(3) { background-color: rgba(94, 234, 212, 0.05); }
+.accordion-item > span:nth-child(4) { background-color: rgba(148, 163, 184, 0.04); }
+
+.accordion-header > span:nth-child(2) { background-color: rgba(251, 191, 36, 0.18); }
+.accordion-header > span:nth-child(3) { background-color: rgba(94, 234, 212, 0.18); }
+.accordion-header > span:nth-child(4) { background-color: rgba(148, 163, 184, 0.15); }
+
+.acc-prod { font-weight: 500; }
+.acc-amt  { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.acc-pts  { font-size: 0.75rem; }
+.acc-date { color: var(--text-muted); font-size: 0.75rem; }
 
 .acc-header-label {
   font-size: 0.65rem;
@@ -1893,10 +1881,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   letter-spacing: 0.1em;
   color: var(--text-secondary);
 }
-.acc-header-label:nth-child(n+2) { text-align: right; }
-.acc-header-label--pts {
-  color: var(--accent-emerald);
-}
+.acc-header-label--pts { color: var(--accent-emerald); }
 
 /* ═══════════════════════════════════════════════════════════════════════
    MODAL
@@ -2095,6 +2080,11 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-size: 0.875rem;
 }
 
+.mv-table th:nth-child(n+4),
+.mv-table td:nth-child(n+4) {
+  text-align: right;
+}
+
 /* Column widths — reuse the same proportions as .tx-table */
 .mv-th--customer { width: 18%; }
 .mv-th--product  { width: 28%; }
@@ -2108,12 +2098,31 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   transition: background 0.14s;
 }
 .mv-row:last-child { border-bottom: none; }
-.mv-row:nth-child(even) { background: rgba(255, 255, 255, 0.025); }
-.mv-row:hover { background: rgba(255, 255, 255, 0.055); }
+/* .mv-row:nth-child(even) { background: rgba(255, 255, 255, 0.025); } -- Removed for column-based color scheme */
+.mv-row:hover { background: rgba(255, 255, 255, 0.055) !important; }
+
+/* Column Tints */
+.mv-table td:nth-child(1) { background-color: rgba(165, 180, 252, 0.07); padding-left: calc(var(--view-indent) + 0.75rem); } /* Customer */
+.mv-table td:nth-child(2) { background-color: rgba(196, 181, 253, 0.05); } /* Product */
+.mv-table td:nth-child(3) { background-color: rgba(251, 191, 36, 0.07); }  /* Amount */
+.mv-table td:nth-child(4) { background-color: rgba(94, 234, 212, 0.05); }  /* Points */
+.mv-table td:nth-child(5) { background-color: rgba(148, 163, 184, 0.04); } /* Date */
+
+/* Header Overrides (re-uses .tx-th, so we only need to set backgrounds) */
+.mv-table th:nth-child(1) {
+  background-color: rgba(165, 180, 252, 0.18);
+  border-right: 1px solid rgba(165, 180, 252, 0.25);
+  color: var(--accent-customer);
+  padding-left: var(--view-indent);
+}
+.mv-table th:nth-child(2) { background-color: rgba(196, 181, 253, 0.15); color: var(--text-secondary); }
+.mv-table th:nth-child(3) { background-color: rgba(251, 191, 36, 0.18); }
+.mv-table th:nth-child(4) { background-color: rgba(94, 234, 212, 0.18); }
+.mv-table th:nth-child(5) { background-color: rgba(148, 163, 184, 0.15); }
 
 /* ── Cells ────────────────────────────────────────────────────────────── */
 .mv-cell {
-  padding: 0.65rem 0.9rem;
+  padding: 0.6rem 0.9rem; /* Standardize vertical padding */
   vertical-align: middle;
   color: var(--text-secondary);
 }

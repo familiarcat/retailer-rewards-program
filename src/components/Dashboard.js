@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRewards } from '../features/rewards/hooks/useRewards';
 import { getTransactions } from '../features/rewards/services/transactionService';
+import { calculateRewardPoints } from '../features/rewards/utils/rewardCalculator';
 
 // ── Navigation modules ────────────────────────────────────────────────────────
 
@@ -153,15 +154,9 @@ const ModuleTile = ({ mod, onNavigate, animIndex = 0 }) => (
   >
     <div className="mod-tile__top">
       <span className="mod-tile__icon">{mod.icon}</span>
-      <span className="mod-tile__badge mod-tile__badge--live">Live</span>
     </div>
     <h3 className="mod-tile__title">{mod.title}</h3>
     <p className="mod-tile__tagline">{mod.tagline}</p>
-    <div className="mod-tile__footer">
-      <span className="mod-tile__cta">
-        Open module <span aria-hidden="true">→</span>
-      </span>
-    </div>
   </div>
 );
 
@@ -260,14 +255,17 @@ const Dashboard = ({ onNavigate }) => {
                 <caption className="rw-caption">Recent Transactions</caption>
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th>Amount</th>
-                    <th>Date</th>
+                    <th className="tx-th tx-th--nodrop">Customer</th>
+                    <th className="tx-th tx-th--nodrop">Product</th>
+                    <th className="tx-th tx-th--nodrop">Amount</th>
+                    <th className="tx-th tx-th--nodrop">Points</th>
+                    <th className="tx-th tx-th--nodrop">Date</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {recent.map((tx, i) => (
+                  {recent.map((tx, i) => {
+                    const pts = calculateRewardPoints(tx.amount);
+                    return (
                     <tr
                       key={tx.transactionId}
                       className="recent-row recent-row--clickable anim-fade-up"
@@ -278,12 +276,18 @@ const Dashboard = ({ onNavigate }) => {
                       onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onNavigate('transactions')}
                       aria-label={`${tx.product} by ${tx.customerId}, $${tx.amount.toFixed(2)}. Click to view all transactions.`}
                     >
-                      <td className="recent-cell recent-cell--product">{tx.product}</td>
                       <td className="recent-cell recent-cell--customer">{tx.customerId}</td>
+                      <td className="recent-cell recent-cell--product">{tx.product}</td>
                       <td className="recent-cell recent-cell--amount">${tx.amount.toFixed(2)}</td>
+                      <td className="recent-cell recent-cell--pts">
+                        <span className={`pts-badge${pts === 0 ? ' pts-badge--zero' : ''}`}>
+                          {pts} pts
+                        </span>
+                      </td>
                       <td className="recent-cell recent-cell--date">{tx.date}</td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

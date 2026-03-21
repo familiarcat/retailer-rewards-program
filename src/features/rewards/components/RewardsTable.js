@@ -104,14 +104,21 @@ const RewardsTable = ({ rewards, totalPoints, customerId, sectionDelay = 0 }) =>
                               <span className="acc-header-label">Date</span>
                             </div>
                             <ul className="accordion-list">
-                              {monthTx.map((tx) => (
+                              {monthTx.map((tx) => {
+                                const pts = calculateRewardPoints(tx.amount);
+                                return (
                                 <li key={tx.transactionId} className="accordion-item">
                                   <span className="acc-prod">{tx.product || 'Unknown Item'}</span>
                                   <span className="acc-amt">${tx.amount.toFixed(2)}</span>
-                                  <span className="acc-pts">+{calculateRewardPoints(tx.amount)} pts</span>
+                                  <span className="acc-pts">
+                                    <span className={`pts-badge${pts === 0 ? ' pts-badge--zero' : ''}`}>
+                                      {pts} pts
+                                    </span>
+                                  </span>
                                   <span className="acc-date">{tx.date}</span>
                                 </li>
-                              ))}
+                                );
+                              })}
                             </ul>
                           </>
                         )}
