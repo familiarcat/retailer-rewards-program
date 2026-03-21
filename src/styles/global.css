@@ -1326,6 +1326,18 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background: rgba(251, 191, 36, 0.22) !important;
 }
 
+/* When any accordion is open, dim other non-expanded rows for focus */
+.rewards-table.has-expanded-row .rw-row--clickable:not(.rw-row--expanded) {
+  opacity: 0.45;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* On hover/focus, bring a dimmed row back to full opacity to interact */
+.rewards-table.has-expanded-row .rw-row--clickable:not(.rw-row--expanded):hover,
+.rewards-table.has-expanded-row .rw-row--clickable:not(.rw-row--expanded):focus-visible {
+  opacity: 1;
+}
+
 /* ── Month name ──────────────────────────────────────────────────────── */
 /* Resting: slightly muted so the hover contrast is clearly perceptible */
 .rw-month-label {
@@ -1807,81 +1819,59 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   font-style: normal;
 }
 
-.accordion-list { list-style: none; margin: 0; padding: 0; }
-
-.accordion-item {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.2fr;
-  padding: 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+.accordion-table {
+  width: 100%;
+  border-collapse: collapse;
   font-size: 0.8rem;
-  align-items: stretch;
-  gap: 0;
-}
-.accordion-item:last-child { border-bottom: none; }
-
-/* Header for the accordion list */
-.accordion-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.2fr;
-  gap: 0;
-  padding: 0;
-  border-bottom: 1px solid var(--glass-border-dim);
-  margin-bottom: 0;
-  align-items: stretch;
 }
 
-/* Cell Styling & Column Tints (matching .tx-table) */
-.accordion-header > span,
-.accordion-item > span {
-  padding: 0.6rem 0.9rem; /* Standardize horizontal padding */
-  display: flex;
-  align-items: center;
+.accordion-table th {
+  /* Use tx-th styles but with different grid proportions */
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em !important;
 }
+.accordion-table th:nth-child(1) { width: 40%; }
+.accordion-table th:nth-child(2) { width: 20%; }
+.accordion-table th:nth-child(3) { width: 20%; }
+.accordion-table th:nth-child(4) { width: 20%; }
 
-/* Header: boosted opacity for better legibility & contrast */
-.accordion-header > span:first-child {
+.accordion-table td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  vertical-align: middle;
+}
+.accordion-table tr:last-child td { border-bottom: none; }
+
+/* Column Tints & Indentation */
+.accordion-table th:first-child {
   padding-left: calc(var(--view-indent) * 2); /* 2.5rem, nests under month */
   background-color: rgba(165, 180, 252, 0.18);
   border-right: 1px solid rgba(165, 180, 252, 0.25);
-  color: var(--text-secondary);
 }
-
-.accordion-item > span:first-child {
-  /* Nests under header label, +0.75rem */
+.accordion-table td:first-child {
   padding-left: calc(var(--view-indent) * 2 + 0.75rem);
   background-color: rgba(165, 180, 252, 0.07);
   border-right: 1px solid rgba(165, 180, 252, 0.12);
   color: var(--text-primary);
+  font-weight: 500;
 }
 
-.accordion-header > span:nth-child(n+3),
-.accordion-item > span:nth-child(n+3) {
+.accordion-table th:nth-child(n+3),
+.accordion-table td:nth-child(n+3) {
   justify-content: flex-end;
   text-align: right;
 }
 
-.accordion-item > span:nth-child(2) { background-color: rgba(251, 191, 36, 0.07); }
-.accordion-item > span:nth-child(3) { background-color: rgba(94, 234, 212, 0.05); }
-.accordion-item > span:nth-child(4) { background-color: rgba(148, 163, 184, 0.04); }
+/* Column Tints */
+.accordion-table th:nth-child(2), .accordion-table td:nth-child(2) { background-color: rgba(251, 191, 36, 0.07); }
+.accordion-table th:nth-child(3), .accordion-table td:nth-child(3) { background-color: rgba(94, 234, 212, 0.05); }
+.accordion-table th:nth-child(4), .accordion-table td:nth-child(4) { background-color: rgba(148, 163, 184, 0.04); }
 
-.accordion-header > span:nth-child(2) { background-color: rgba(251, 191, 36, 0.18); }
-.accordion-header > span:nth-child(3) { background-color: rgba(94, 234, 212, 0.18); }
-.accordion-header > span:nth-child(4) { background-color: rgba(148, 163, 184, 0.15); }
-
-.acc-prod { font-weight: 500; }
-.acc-amt  { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-primary); }
-.acc-pts  { font-size: 0.75rem; }
-.acc-date { color: var(--text-muted); font-size: 0.75rem; }
-
-.acc-header-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-secondary);
-}
-.acc-header-label--pts { color: var(--accent-emerald); }
+/* Header Tint Overrides */
+.accordion-table th:nth-child(2) { background-color: rgba(251, 191, 36, 0.18); }
+.accordion-table th:nth-child(3) { background-color: rgba(94, 234, 212, 0.18); }
+.accordion-table th:nth-child(4) { background-color: rgba(148, 163, 184, 0.15); }
 
 /* ═══════════════════════════════════════════════════════════════════════
    MODAL
@@ -2061,9 +2051,9 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 /* Each stat type gets its own accent colour */
-.mv-stat--count  .mv-stat__val { color: var(--accent-indigo); }
-.mv-stat--amount .mv-stat__val { color: var(--accent-teal);   }
-.mv-stat--points .mv-stat__val { color: var(--accent-months); }
+.mv-stat--count  .mv-stat__val { color: var(--accent-indigo); } /* Transactions */
+.mv-stat--amount .mv-stat__val { color: var(--accent-months); } /* Total Spend (Amber) */
+.mv-stat--points .mv-stat__val { color: var(--accent-teal);   } /* Points Earned (Teal) */
 
 /* ── Table wrapper — glass panel container ───────────────────────────── */
 .mv-table-wrap {

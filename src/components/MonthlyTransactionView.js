@@ -18,12 +18,21 @@ import { calculateRewardPoints } from '../features/rewards/utils/rewardCalculato
 const MonthlyTransactionView = ({ phase = 'idle' }) => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading]           = useState(true);
+  const [sorts, setSorts]               = useState({}); // { [monthKey]: { key, dir } }
 
   useEffect(() => {
     getTransactions()
       .then(setTransactions)
       .finally(() => setLoading(false));
   }, []);
+
+  const handleSort = (monthKey, columnKey) => {
+    setSorts(prev => {
+      const current = prev[monthKey] || {};
+      const dir = current.key === columnKey && current.dir === 'asc' ? 'desc' : 'asc';
+      return { ...prev, [monthKey]: { key: columnKey, dir } };
+    });
+  };
 
   if (loading) return <div className="loading">Loading transaction data…</div>;
 
@@ -64,6 +73,16 @@ const MonthlyTransactionView = ({ phase = 'idle' }) => {
         const sectionDelay = isExiting ? `${idx * 20}ms` : `${idx * 70}ms`;
         const sectionAnim  = isExiting ? 'anim-exit-down' : 'anim-fade-up';
         const maxRowAmt    = Math.max(...month.transactions.map((t) => t.amount), 1);
+        const currentSort  = sorts[month.key] || { key: 'date', dir: 'desc' };
+
+        const sortedTxs = [...month.transactions].sort((a, b) => {
+          const dir = currentSort.dir === 'asc' ? 1 : -1;
+          const va = a[currentSort.key] || '';
+          const vb = b[currentSort.key] || '';
+          if (va < vb) return -1 * dir;
+          if (va > vb) return 1 * dir;
+          return 0;
+        });
 
         return (
           <section
@@ -104,15 +123,30 @@ const MonthlyTransactionView = ({ phase = 'idle' }) => {
               <table className="mv-table">
                 <thead>
                   <tr>
-                    <th className="tx-th mv-th--customer">Customer</th>
-                    <th className="tx-th mv-th--product">Product</th>
-                    <th className="tx-th mv-th--amount">Amount</th>
-                    <th className="tx-th mv-th--points">Points</th>
-                    <th className="tx-th mv-th--date">Date</th>
+                    <th className={`tx-th mv-th--customer ${currentSort.key === 'customerId' ? 'tx-th--sorted' : ''}`} onClick={() => handleSort(month.key, 'customerId')}>
+                      Customer
+                      {currentSort.key === 'customerId' && <span aria-hidden="true">{currentSort.dir === 'asc' ? ' ↑' : ' ↓'}</span>}
+                    </th>
+                    <th className={`tx-th mv-th--product ${currentSort.key === 'product' ? 'tx-th--sorted' : ''}`} onClick={() => handleSort(month.key, 'product')}>
+                      Product
+                      {currentSort.key === 'product' && <span aria-hidden="true">{currentSort.dir === 'asc' ? ' ↑' : ' ↓'}</span>}
+                    </th>
+                    <th className={`tx-th mv-th--amount ${currentSort.key === 'amount' ? 'tx-th--sorted' : ''}`} onClick={() => handleSort(month.key, 'amount')}>
+                      Amount
+                      {currentSort.key === 'amount' && <span aria-hidden="true">{currentSort.dir === 'asc' ? ' ↑' : ' ↓'}</span>}
+                    </th>
+                    <th className={`tx-th mv-th--points ${currentSort.key === 'points' ? 'tx-th--sorted' : ''}`} onClick={() => handleSort(month.key, 'points')}>
+                      Points
+                      {currentSort.key === 'points' && <span aria-hidden="true">{currentSort.dir === 'asc' ? ' ↑' : ' ↓'}</span>}
+                    </th>
+                    <th className={`tx-th mv-th--date ${currentSort.key === 'date' ? 'tx-th--sorted' : ''}`} onClick={() => handleSort(month.key, 'date')}>
+                      Date
+                      {currentSort.key === 'date' && <span aria-hidden="true">{currentSort.dir === 'asc' ? ' ↑' : ' ↓'}</span>}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {month.transactions.map((tx, rowIdx) => {
+                  {sortedTxs.map((tx, rowIdx) => {
                     // Micro amount bar — same backgroundSize trick as TransactionView
                     const rawPct  = Math.round((tx.amount / maxRowAmt) * 100);
                     const barPct  = Math.max(rawPct, 3);
