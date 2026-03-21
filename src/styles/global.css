@@ -1157,20 +1157,10 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  padding: 1.5rem 0; /* Horizontal padding removed for edge-to-edge table */
+  padding: 1.5rem var(--view-indent);
   position: relative;
   overflow: hidden;
   overflow: visible;
-}
-
-/* Per-customer accent bar — amber→green = points earned visual language */
-.customer-section::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--gradient-pts);
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 /*
@@ -1241,11 +1231,11 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background-color: rgba(165, 180, 252, 0.18);
   border-right: 1px solid rgba(165, 180, 252, 0.25);
   color: var(--text-primary);
-  padding-left: var(--view-indent);
+  padding-left: 0;
 }
 .rewards-table td:first-child {
   background-color: rgba(165, 180, 252, 0.07);
-  padding-left: calc(var(--view-indent) + 0.75rem); /* Staggered indentation */
+  padding-left: 0.75rem; /* Staggered indentation */
   border-right: 1px solid rgba(165, 180, 252, 0.14);
   /* Month names in full white for maximum legibility against the indigo tint */
   color: #ffffff;
