@@ -135,6 +135,7 @@ body {
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 
   /* Dark base — atmospheric colour orbs */
   background-color: #0c0a09;
@@ -1192,7 +1193,11 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
 }
 
 /* ── Rewards table ────────────────────────────────────────────────────── */
-.rewards-table { width: 100%; }
+.rewards-table {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 .rewards-table table {
   width: 100%;
@@ -1752,23 +1757,47 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
    RESPONSIVE
    ══════════════════════════════════════════════════════════════════════ */
 
-@media (max-width: 860px) {
+@media (max-width: 1024px) {
   .dash-body { grid-template-columns: 1fr; }
+
+  /* Tablet/Landscape header adjustments: bring logo inline to prevent bleeding */
+  .app-logo { margin: 0 0.75rem 0 0; width: 64px; height: 64px; }
+  .app-header-text { flex-wrap: wrap; }
+  .app-header-tagline {
+    margin: 0.25rem 0 0 0; padding: 0; border: none;
+    flex-basis: 100%; font-size: 1rem;
+  }
 }
 
 @media (max-width: 640px) {
   :root {
     --layout-gutter: 1rem;
     --padding-bottom-main: 2rem;
+    --view-indent: 0.5rem;
   }
   .page-title     { font-size: 1.4rem; }
   .kpi-row        { grid-template-columns: repeat(2, 1fr); }
   .mod-grid       { grid-template-columns: 1fr; }
+  
   /* Hide the Date column on narrow viewports — least critical data point */
   .recent-table th:nth-child(5),
-  .recent-table td:nth-child(5) { display: none; }
+  .recent-table td:nth-child(5),
+  .mv-table th:nth-child(5),
+  .mv-table td:nth-child(5) { display: none; }
+
   .tx-toolbar     { flex-direction: column; align-items: stretch; }
   .pchart-row     { grid-template-columns: 6rem 1fr 3rem; }
+
+  /* Fix header logo bleeding and tagline wrapping */
+  .app-logo { width: 52px; height: 52px; } /* Smaller logo for mobile */
+  .app-header-tagline {
+    font-size: 0.95rem;
+  }
+
+  /* Standardize header padding on mobile to match the rest of the layout */
+  .app-header {
+    padding: 1.1rem var(--layout-gutter);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -2050,7 +2079,7 @@ h1, h2, h3 { color: var(--text-primary); margin-top: 0; }
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 /* ── Table ────────────────────────────────────────────────────────────── */

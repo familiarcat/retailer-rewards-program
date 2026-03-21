@@ -204,7 +204,7 @@ const RewardsTable = ({
             style={{ '--anim-delay': `${sectionDelay + 50 + sortedRewards.length * 30}ms` }}
           >
             <td colSpan="2" style={{ textAlign: 'left', paddingTop: '1rem' }}>
-              <div className="total-points">Total: {totalPoints}</div>
+              <div className="total-points">Total: {totalPoints} Points</div>
             </td>
           </tr>
         </tbody>
